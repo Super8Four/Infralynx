@@ -1,4 +1,4 @@
-# README.md for InfraLynx
+InfraLynx
 
 # InfraLynx
 
