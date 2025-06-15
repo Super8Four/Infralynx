@@ -11,6 +11,7 @@ A modern infrastructure management system built with Node.js, TypeScript, and Po
 - TypeScript support
 - PostgreSQL database with Prisma ORM
 - Comprehensive test suite
+- Modern React frontend (coming soon)
 
 ## Prerequisites
 
@@ -79,18 +80,64 @@ npm test
 - `GET /api/devices` - Get all devices
 - `GET /api/devices/:id` - Get device by ID
 - `POST /api/devices` - Create new device
+- `PATCH /api/devices/:id` - Update device
+- `DELETE /api/devices/:id` - Delete device
+
+Request body for POST/PATCH:
+```json
+{
+  "name": "string",
+  "type": "string",
+  "status": "string",
+  "rackId": "number (optional)",
+  "siteId": "number (optional)"
+}
+```
 
 ### Racks
 
 - `GET /api/racks` - Get all racks
 - `GET /api/racks/:id` - Get rack by ID
 - `POST /api/racks` - Create new rack
+- `PATCH /api/racks/:id` - Update rack
+- `DELETE /api/racks/:id` - Delete rack
+
+Request body for POST/PATCH:
+```json
+{
+  "name": "string",
+  "location": "string",
+  "capacity": "number",
+  "siteId": "number (optional)"
+}
+```
 
 ### Sites
 
 - `GET /api/sites` - Get all sites
 - `GET /api/sites/:id` - Get site by ID
 - `POST /api/sites` - Create new site
+- `PATCH /api/sites/:id` - Update site
+- `DELETE /api/sites/:id` - Delete site
+
+Request body for POST/PATCH:
+```json
+{
+  "name": "string",
+  "address": "string"
+}
+```
+
+## Response Format
+
+All API responses follow this format:
+```json
+{
+  "status": "success" | "fail" | "error",
+  "data": object | array | null,
+  "message": "string (only for errors)"
+}
+```
 
 ## Database Schema
 
@@ -119,6 +166,22 @@ npm test
 - address: string
 - createdAt: Date
 - updatedAt: Date
+
+## Frontend (Coming Soon)
+
+The frontend will be built with:
+- React + TypeScript
+- Material-UI for components
+- React Router for navigation
+- Axios for API calls
+
+Features:
+- Modern, responsive dashboard
+- Device management interface
+- Rack visualization
+- Site management
+- Search and filtering
+- Real-time updates
 
 ## Contributing
 
