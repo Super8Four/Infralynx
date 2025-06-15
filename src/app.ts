@@ -7,6 +7,7 @@ import { requestLogger, errorLogger } from './utils/logger';
 import deviceRoutes from './routes/device.routes';
 import rackRoutes from './routes/rack.routes';
 import siteRoutes from './routes/site.routes';
+import ipRoutes from './routes/ip.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 // Load environment variables
@@ -26,6 +27,7 @@ app.use('/api', apiRoutes);
 app.use('/api/devices', deviceRoutes);
 app.use('/api/racks', rackRoutes);
 app.use('/api/sites', siteRoutes);
+app.use('/api/ip', ipRoutes);
 
 // Error handling middleware
 app.use(errorLogger);

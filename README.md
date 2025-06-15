@@ -1,12 +1,18 @@
 # InfraLynx
 
-A modern infrastructure management system built with Node.js, TypeScript, and PostgreSQL.
+A modern infrastructure management system for tracking and managing data center assets, including devices, racks, sites, and IP addresses.
 
 ## Features
 
-- Device management (servers, network equipment, etc.)
-- Rack management with capacity tracking
-- Site management
+- **Device Management**: Track servers, network equipment, and other devices
+- **Rack Management**: Organize devices within racks and track rack space utilization
+- **Site Management**: Manage multiple data center locations
+- **IP Address Management**: Track IPv4 and IPv6 addresses and prefixes
+  - Hierarchical IP prefix management
+  - IP address assignment to devices
+  - Support for both IPv4 and IPv6
+  - Status tracking for IP resources
+  - Parent-child relationships for IP prefixes
 - RESTful API
 - TypeScript support
 - PostgreSQL database with Prisma ORM
@@ -32,156 +38,110 @@ cd infralynx
 npm install
 ```
 
-3. Set up environment variables:
-Create a `.env` file in the root directory with the following content:
-```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/infralynx?schema=public"
+3. Create a `.env` file in the root directory:
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/infralynx"
 PORT=3000
 NODE_ENV=development
 ```
 
-4. Set up the database:
+4. Initialize the database:
 ```bash
-# Create the database
-createdb infralynx
-
-# Run migrations
 npx prisma migrate dev
-
-# Initialize with sample data
-npm run db:init
+npx prisma db seed
 ```
 
-## Development
-
-Start the development server:
+5. Start the development server:
 ```bash
 npm run dev
-```
-
-The server will start at http://localhost:3000
-
-## Testing
-
-1. Set up test database:
-```bash
-createdb infralynx_test
-```
-
-2. Run tests:
-```bash
-npm test
 ```
 
 ## API Endpoints
 
 ### Devices
-
-- `GET /api/devices` - Get all devices
-- `GET /api/devices/:id` - Get device by ID
-- `POST /api/devices` - Create new device
-- `PATCH /api/devices/:id` - Update device
-- `DELETE /api/devices/:id` - Delete device
-
-Request body for POST/PATCH:
-```json
-{
-  "name": "string",
-  "type": "string",
-  "status": "string",
-  "rackId": "number (optional)",
-  "siteId": "number (optional)"
-}
-```
+- `GET /api/devices` - List all devices
+- `POST /api/devices` - Create a new device
+- `GET /api/devices/:id` - Get device details
+- `PATCH /api/devices/:id` - Update a device
+- `DELETE /api/devices/:id` - Delete a device
 
 ### Racks
-
-- `GET /api/racks` - Get all racks
-- `GET /api/racks/:id` - Get rack by ID
-- `POST /api/racks` - Create new rack
-- `PATCH /api/racks/:id` - Update rack
-- `DELETE /api/racks/:id` - Delete rack
-
-Request body for POST/PATCH:
-```json
-{
-  "name": "string",
-  "location": "string",
-  "capacity": "number",
-  "siteId": "number (optional)"
-}
-```
+- `GET /api/racks` - List all racks
+- `POST /api/racks` - Create a new rack
+- `GET /api/racks/:id` - Get rack details
+- `PATCH /api/racks/:id` - Update a rack
+- `DELETE /api/racks/:id` - Delete a rack
 
 ### Sites
+- `GET /api/sites` - List all sites
+- `POST /api/sites` - Create a new site
+- `GET /api/sites/:id` - Get site details
+- `PATCH /api/sites/:id` - Update a site
+- `DELETE /api/sites/:id` - Delete a site
 
-- `GET /api/sites` - Get all sites
-- `GET /api/sites/:id` - Get site by ID
-- `POST /api/sites` - Create new site
-- `PATCH /api/sites/:id` - Update site
-- `DELETE /api/sites/:id` - Delete site
+### IP Management
+- `GET /api/ip/prefixes` - List all IP prefixes
+- `POST /api/ip/prefixes` - Create a new IP prefix
+- `GET /api/ip/prefixes/:id` - Get IP prefix details
+- `PATCH /api/ip/prefixes/:id` - Update an IP prefix
+- `DELETE /api/ip/prefixes/:id` - Delete an IP prefix
+- `GET /api/ip/addresses` - List all IP addresses
+- `POST /api/ip/addresses` - Create a new IP address
+- `GET /api/ip/addresses/:id` - Get IP address details
+- `PATCH /api/ip/addresses/:id` - Update an IP address
+- `DELETE /api/ip/addresses/:id` - Delete an IP address
 
-Request body for POST/PATCH:
+### Request Body Examples
+
+#### Create IP Prefix
 ```json
 {
-  "name": "string",
-  "address": "string"
+  "prefix": "192.168.1.0/24",
+  "description": "Main network",
+  "status": "ACTIVE",
+  "siteId": "site-uuid",
+  "parentId": "parent-prefix-uuid" // Optional
 }
 ```
 
-## Response Format
+#### Create IP Address
+```json
+{
+  "address": "192.168.1.1",
+  "description": "Gateway",
+  "status": "ACTIVE",
+  "deviceId": "device-uuid",
+  "prefixId": "prefix-uuid"
+}
+```
 
+### Response Format
 All API responses follow this format:
 ```json
 {
-  "status": "success" | "fail" | "error",
-  "data": object | array | null,
-  "message": "string (only for errors)"
+  "success": true,
+  "data": {
+    // Response data
+  }
 }
 ```
 
-## Database Schema
+## Development
 
-### Device
-- id: number
-- name: string
-- type: string
-- status: string
-- rackId: number (optional)
-- siteId: number (optional)
-- createdAt: Date
-- updatedAt: Date
+### Running Tests
+```bash
+npm test
+```
 
-### Rack
-- id: number
-- name: string
-- location: string
-- capacity: number
-- siteId: number (optional)
-- createdAt: Date
-- updatedAt: Date
+### Database Migrations
+```bash
+npx prisma migrate dev
+```
 
-### Site
-- id: number
-- name: string
-- address: string
-- createdAt: Date
-- updatedAt: Date
-
-## Frontend (Coming Soon)
-
-The frontend will be built with:
-- React + TypeScript
-- Material-UI for components
-- React Router for navigation
-- Axios for API calls
-
-Features:
-- Modern, responsive dashboard
-- Device management interface
-- Rack visualization
-- Site management
-- Search and filtering
-- Real-time updates
+### Generating Prisma Client
+```bash
+npx prisma generate
+```
 
 ## Contributing
 
@@ -193,4 +153,4 @@ Features:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

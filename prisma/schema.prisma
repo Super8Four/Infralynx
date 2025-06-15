@@ -19,6 +19,7 @@ model Device {
   siteId    Int?
   rack      Rack?    @relation(fields: [rackId], references: [id])
   site      Site?    @relation(fields: [siteId], references: [id])
+  ipAddresses IPAddress[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -46,6 +47,43 @@ model Site {
   address   String
   devices   Device[]
   racks     Rack[]
+  ipPrefixes IPPrefix[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model IPPrefix {
+  id          Int         @id @default(autoincrement())
+  prefix      String      // e.g., "192.168.1.0/24"
+  description String?
+  status      String      // Active, Reserved, Deprecated
+  siteId      Int?
+  site        Site?       @relation(fields: [siteId], references: [id])
+  parentId    Int?
+  parent      IPPrefix?   @relation("PrefixHierarchy", fields: [parentId], references: [id])
+  children    IPPrefix[]  @relation("PrefixHierarchy")
+  ipAddresses IPAddress[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([siteId])
+  @@index([parentId])
+  @@unique([prefix])
+}
+
+model IPAddress {
+  id          Int       @id @default(autoincrement())
+  address     String    // e.g., "192.168.1.1"
+  description String?
+  status      String    // Active, Reserved, Deprecated
+  deviceId    Int?
+  device      Device?   @relation(fields: [deviceId], references: [id])
+  prefixId    Int?
+  prefix      IPPrefix? @relation(fields: [prefixId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([deviceId])
+  @@index([prefixId])
+  @@unique([address])
 } 
