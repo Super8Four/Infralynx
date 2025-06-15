@@ -4,6 +4,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import apiRoutes from './routes/api';
 import { requestLogger, errorLogger } from './utils/logger';
+import deviceRoutes from './routes/device.routes';
+import rackRoutes from './routes/rack.routes';
+import siteRoutes from './routes/site.routes';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 // Load environment variables
 dotenv.config();
@@ -19,24 +23,14 @@ app.use(requestLogger);
 
 // Routes
 app.use('/api', apiRoutes);
+app.use('/api/devices', deviceRoutes);
+app.use('/api/racks', rackRoutes);
+app.use('/api/sites', siteRoutes);
 
 // Error handling middleware
 app.use(errorLogger);
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err.stack);
-    res.status(500).json({
-        error: 'Internal Server Error',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
-    });
-});
-
-// 404 handler
-app.use((req: Request, res: Response) => {
-    res.status(404).json({
-        error: 'Not Found',
-        message: 'The requested resource was not found'
-    });
-});
+app.use(errorHandler);
+app.use(notFoundHandler);
 
 // Start the server
 app.listen(PORT, () => {
