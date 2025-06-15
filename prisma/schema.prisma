@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Device {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  status    String
+  rackId    Int?
+  siteId    Int?
+  rack      Rack?    @relation(fields: [rackId], references: [id])
+  site      Site?    @relation(fields: [siteId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([rackId])
+  @@index([siteId])
+}
+
+model Rack {
+  id        Int       @id @default(autoincrement())
+  name      String
+  location  String
+  capacity  Int
+  devices   Device[]
+  siteId    Int?
+  site      Site?     @relation(fields: [siteId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([siteId])
+}
+
+model Site {
+  id        Int       @id @default(autoincrement())
+  name      String
+  address   String
+  devices   Device[]
+  racks     Rack[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+} 
