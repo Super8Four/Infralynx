@@ -1,0 +1,157 @@
+// CoreUI Variables
+$enable-rounded: true;
+$enable-shadows: true;
+$enable-gradients: false;
+$enable-transitions: true;
+
+// Colors
+$primary: #321fdb;
+$secondary: #9da5b1;
+$success: #2eb85c;
+$info: #39f;
+$warning: #f9b115;
+$danger: #e55353;
+$light: #ebedef;
+$dark: #4f5d73;
+
+// Typography
+$font-family-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-size-base: 0.875rem;
+$font-weight-normal: 400;
+$font-weight-bold: 600;
+
+// Spacing
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+);
+
+// Border
+$border-radius: 0.25rem;
+$border-radius-lg: 0.5rem;
+$border-radius-sm: 0.2rem;
+
+// Shadows
+$box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+$box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+$box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+
+// Cards
+$card-border-width: 0;
+$card-border-radius: $border-radius-lg;
+$card-box-shadow: $box-shadow;
+
+// Tables
+$table-cell-padding: 1rem;
+$table-cell-padding-sm: 0.5rem;
+$table-border-color: #d8dbe0;
+
+// Buttons
+$btn-padding-y: 0.5rem;
+$btn-padding-x: 1rem;
+$btn-font-weight: $font-weight-bold;
+$btn-border-radius: $border-radius;
+$btn-box-shadow: $box-shadow-sm;
+
+// Forms
+$input-padding-y: 0.5rem;
+$input-padding-x: 0.75rem;
+$input-border-radius: $border-radius;
+$input-box-shadow: $box-shadow-sm;
+
+// Navbar
+$navbar-padding-y: 1rem;
+$navbar-padding-x: 1rem;
+$navbar-brand-padding-y: 0.5rem;
+$navbar-brand-padding-x: 1rem;
+
+// Sidebar
+$sidebar-width: 256px;
+$sidebar-bg: #fff;
+$sidebar-color: #3c4b64;
+$sidebar-nav-link-padding-y: 0.75rem;
+$sidebar-nav-link-padding-x: 1rem;
+$sidebar-nav-link-color: #3c4b64;
+$sidebar-nav-link-hover-color: $primary;
+$sidebar-nav-link-active-color: $primary;
+$sidebar-nav-link-active-bg: rgba($primary, 0.1);
+
+// Import CoreUI
+@import '@coreui/coreui/scss/coreui';
+
+// Custom styles
+.app-header {
+  background: #fff;
+  border-bottom: 1px solid #d8dbe0;
+}
+
+.app-sidebar {
+  background: #fff;
+  border-right: 1px solid #d8dbe0;
+}
+
+.app-footer {
+  background: #fff;
+  border-top: 1px solid #d8dbe0;
+}
+
+.card {
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.table {
+  th {
+    font-weight: $font-weight-bold;
+    background-color: #f8f9fa;
+  }
+}
+
+.btn {
+  text-transform: none;
+  letter-spacing: 0;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.form-control {
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.25);
+  }
+}
+
+// Custom utilities
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+} 
