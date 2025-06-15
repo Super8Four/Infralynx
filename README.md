@@ -33,7 +33,7 @@ InfraLynx is a modern infrastructure management system designed to help organiza
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/infralynx.git
+   git clone https://github.com/superfour/infralynx.git
    cd infralynx
    ```
 
