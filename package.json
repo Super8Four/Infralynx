@@ -1,0 +1,45 @@
+{
+  "name": "infralynx",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portable IPAM and DCIM platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@infralynx/shared && npm run build --workspace=@infralynx/api && npm run build --workspace=@infralynx/web",
+    "dev": "npm run build --workspace=@infralynx/shared && concurrently -n shared,api,web -c yellow,cyan,green \"npm run dev --workspace=@infralynx/shared\" \"npm run dev --workspace=@infralynx/api\" \"npm run dev --workspace=@infralynx/web\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint \"apps/**/*.{ts,tsx}\" \"packages/**/*.ts\" eslint.config.mjs",
+    "test": "npm run test --workspace=@infralynx/shared && npm run test --workspace=@infralynx/api && npm run test --workspace=@infralynx/web",
+    "test:e2e": "playwright test",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "concurrently": "^10.0.3",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.5",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.63.0",
+    "vitest": "^4.1.10"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.1": true,
+    "argon2@0.44.0": true
+  }
+}

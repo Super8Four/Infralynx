@@ -1,0 +1,24 @@
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+.brand-link {
+  color: inherit;
+}
+
+.status-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.status-dot-ok {
+  background: var(--bs-success);
+  box-shadow: 0 0 0 0.2rem rgb(25 135 84 / 20%);
+}
+
+.status-dot-waiting {
+  background: var(--bs-secondary);
+}
