@@ -1,6 +1,7 @@
 FROM node:24-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.base.json ./
+COPY scripts scripts
 COPY packages/shared/package.json packages/shared/package.json
 COPY apps/web/package.json apps/web/package.json
 RUN npm ci --workspace=@infralynx/shared --workspace=@infralynx/web --include-workspace-root

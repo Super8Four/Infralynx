@@ -1,6 +1,7 @@
 FROM node:24-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.base.json ./
+COPY scripts scripts
 COPY packages/shared/package.json packages/shared/package.json
 COPY apps/api/package.json apps/api/package.json
 RUN npm ci --workspace=@infralynx/shared --workspace=@infralynx/api --include-workspace-root
@@ -12,6 +13,7 @@ FROM node:24-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 COPY package.json package-lock.json ./
+COPY scripts scripts
 COPY packages/shared/package.json packages/shared/package.json
 COPY apps/api/package.json apps/api/package.json
 RUN npm ci --omit=dev --workspace=@infralynx/shared --workspace=@infralynx/api --include-workspace-root && npm cache clean --force
