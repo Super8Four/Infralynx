@@ -79,6 +79,13 @@ work that was not present in the local remote-tracking branch.
 Direct pushes, force pushes, and deletion of `main` are prohibited. Merge
 commits are not used for ordinary pull requests.
 
+Running `npm install` configures the repository to use the committed Git hooks
+in `.githooks`. The pre-push hook rejects direct pushes of `main` to `origin`.
+This is a local safety net, not a substitute for GitHub branch protection.
+When the repository plan supports protected private branches, `main` should
+require the `quality` and `containers` checks, linear history, resolved review
+conversations, and pull requests while disallowing force pushes and deletion.
+
 ## Recovering from mistakes
 
 Git records remembered conflict resolutions through `rerere`. If a rebase is

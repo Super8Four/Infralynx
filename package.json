@@ -12,6 +12,7 @@
     "dev": "npm run build --workspace=@infralynx/shared && concurrently -n shared,api,web -c yellow,cyan,green \"npm run dev --workspace=@infralynx/shared\" \"npm run dev --workspace=@infralynx/api\" \"npm run dev --workspace=@infralynx/web\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "prepare": "git config core.hooksPath .githooks",
     "prepare:shared": "npm run build --workspace=@infralynx/shared",
     "lint": "npm run prepare:shared && eslint \"apps/**/*.{ts,tsx}\" \"packages/**/*.ts\" eslint.config.mjs",
     "test": "npm run prepare:shared && npm run test --workspace=@infralynx/shared && npm run test --workspace=@infralynx/api && npm run test --workspace=@infralynx/web",

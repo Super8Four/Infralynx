@@ -1,0 +1,17 @@
+#!/bin/sh
+
+remote_name="$1"
+
+if [ "$remote_name" != "origin" ] || [ "${ALLOW_MAIN_PUSH:-0}" = "1" ]; then
+  exit 0
+fi
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_ref" = "refs/heads/main" ]; then
+    echo "Direct pushes to main are blocked. Push a short-lived branch and open a pull request." >&2
+    echo "For the documented initial/recovery exception only, set ALLOW_MAIN_PUSH=1." >&2
+    exit 1
+  fi
+done
+
+exit 0
