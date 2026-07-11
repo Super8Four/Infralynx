@@ -15,5 +15,7 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - PostgreSQL-backed prefix creation, listing, deletion, and audit events.
 - Facilities site management: hierarchical regions, site groups, sites, and
   site locations, with PostgreSQL persistence and audit events.
+- NetBox-inspired site inventory and detail views, with Infralynx brand
+  palette, search, filters, related locations, and assigned prefixes.
 
 [Unreleased]: https://github.com/Super8Four/Infralynx/compare/v0.1.0...HEAD

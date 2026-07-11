@@ -1,61 +1,15 @@
 import {
-  facilitySiteListSchema,
   facilityStatusSchema,
-  locationListSchema,
-  locationSchema,
-  regionListSchema,
-  regionSchema,
-  siteGroupListSchema,
-  siteGroupSchema,
   siteSchema,
   type FacilityStatus,
 } from '@infralynx/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { type FormEvent, useState } from 'react';
+import { Link } from 'react-router';
+import { type FormEvent, useMemo, useState } from 'react';
 
-async function api<T>(
-  url: string,
-  init: RequestInit | undefined,
-  parse: (value: unknown) => T,
-) {
-  const response = await fetch(url, init);
-  if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as {
-      error?: { message?: string };
-    } | null;
-    throw new Error(
-      payload?.error?.message ??
-        `Request failed with status ${response.status}.`,
-    );
-  }
-  return parse(await response.json());
-}
+import { getFacilitySites, getRegions, getSiteGroups } from '../lib/facilities';
+import { api } from '../lib/http';
 
-const getRegions = () =>
-  api('/api/v1/facilities/regions', undefined, (value) =>
-    regionListSchema.parse(value),
-  );
-const getSiteGroups = () =>
-  api('/api/v1/facilities/site-groups', undefined, (value) =>
-    siteGroupListSchema.parse(value),
-  );
-const getSites = () =>
-  api('/api/v1/facilities/sites', undefined, (value) =>
-    facilitySiteListSchema.parse(value),
-  );
-const getLocations = () =>
-  api('/api/v1/facilities/locations', undefined, (value) =>
-    locationListSchema.parse(value),
-  );
-
-const blankHierarchy = {
-  name: '',
-  slug: '',
-  parentId: '',
-  description: '',
-  owner: '',
-  comments: '',
-};
 const blankSite = {
   name: '',
   slug: '',
@@ -72,86 +26,31 @@ const blankSite = {
   owner: '',
   comments: '',
 };
-const blankLocation = {
-  siteId: '',
-  name: '',
-  slug: '',
-  status: 'active' as FacilityStatus,
-  parentId: '',
-  facility: '',
-  description: '',
-  owner: '',
-  comments: '',
-};
 
 function emptyToNull(value: string) {
   return value.trim() || null;
 }
 
-function errorMessage(...errors: Array<Error | null | undefined>) {
-  return errors.find(Boolean)?.message;
-}
-
 export function Facilities() {
   const queryClient = useQueryClient();
-  const [regionForm, setRegionForm] = useState(blankHierarchy);
-  const [siteGroupForm, setSiteGroupForm] = useState(blankHierarchy);
-  const [siteForm, setSiteForm] = useState(blankSite);
-  const [locationForm, setLocationForm] = useState(blankLocation);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
+  const [regionId, setRegionId] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
+  const [form, setForm] = useState(blankSite);
 
+  const sitesQuery = useQuery({
+    queryKey: ['facility-sites'],
+    queryFn: getFacilitySites,
+  });
   const regionsQuery = useQuery({ queryKey: ['regions'], queryFn: getRegions });
   const groupsQuery = useQuery({
     queryKey: ['site-groups'],
     queryFn: getSiteGroups,
   });
-  const sitesQuery = useQuery({
-    queryKey: ['facility-sites'],
-    queryFn: getSites,
-  });
-  const locationsQuery = useQuery({
-    queryKey: ['locations'],
-    queryFn: getLocations,
-  });
 
-  const regionMutation = useMutation({
-    mutationFn: (input: typeof blankHierarchy) =>
-      api(
-        '/api/v1/facilities/regions',
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            ...input,
-            parentId: emptyToNull(input.parentId),
-          }),
-        },
-        (value) => regionSchema.parse(value),
-      ),
-    onSuccess: async () => {
-      setRegionForm(blankHierarchy);
-      await queryClient.invalidateQueries({ queryKey: ['regions'] });
-    },
-  });
-  const siteGroupMutation = useMutation({
-    mutationFn: (input: typeof blankHierarchy) =>
-      api(
-        '/api/v1/facilities/site-groups',
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            ...input,
-            parentId: emptyToNull(input.parentId),
-          }),
-        },
-        (value) => siteGroupSchema.parse(value),
-      ),
-    onSuccess: async () => {
-      setSiteGroupForm(blankHierarchy);
-      await queryClient.invalidateQueries({ queryKey: ['site-groups'] });
-    },
-  });
-  const siteMutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: (input: typeof blankSite) =>
       api(
         '/api/v1/facilities/sites',
@@ -167,380 +66,344 @@ export function Facilities() {
         (value) => siteSchema.parse(value),
       ),
     onSuccess: async () => {
-      setSiteForm(blankSite);
+      setForm(blankSite);
+      setShowCreate(false);
       await queryClient.invalidateQueries({ queryKey: ['facility-sites'] });
       await queryClient.invalidateQueries({ queryKey: ['sites'] });
     },
   });
-  const locationMutation = useMutation({
-    mutationFn: (input: typeof blankLocation) =>
-      api(
-        '/api/v1/facilities/locations',
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            ...input,
-            parentId: emptyToNull(input.parentId),
-          }),
-        },
-        (value) => locationSchema.parse(value),
-      ),
-    onSuccess: async () => {
-      setLocationForm(blankLocation);
-      await queryClient.invalidateQueries({ queryKey: ['locations'] });
-    },
-  });
 
-  const error = errorMessage(
-    regionsQuery.error,
-    groupsQuery.error,
-    sitesQuery.error,
-    locationsQuery.error,
-    regionMutation.error,
-    siteGroupMutation.error,
-    siteMutation.error,
-    locationMutation.error,
-  );
-  const selectedLocationParents = (locationsQuery.data ?? []).filter(
-    (location) => location.siteId === locationForm.siteId,
-  );
-
-  const submit =
-    (action: () => void) => (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      action();
-    };
+  const filteredSites = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase();
+    return (sitesQuery.data ?? []).filter((site) => {
+      const matchesSearch =
+        !query ||
+        [
+          site.name,
+          site.slug,
+          site.facility,
+          site.regionName,
+          site.groupName,
+          site.description,
+        ].some((value) => value?.toLocaleLowerCase().includes(query));
+      return (
+        matchesSearch &&
+        (!status || site.status === status) &&
+        (!regionId || site.regionId === regionId)
+      );
+    });
+  }, [regionId, search, sitesQuery.data, status]);
 
   return (
-    <div className="row g-3">
-      <div className="col-12">
-        <div className="d-flex flex-wrap align-items-end justify-content-between gap-2">
-          <div>
-            <h1 className="h3 mb-1">Site management</h1>
-            <p className="text-secondary mb-0">
-              Organize your presence geographically and functionally before
-              assigning IPAM resources.
-            </p>
-          </div>
-          <div className="small text-secondary">
-            Racks, devices, and other DCIM inventory are not part of this
-            release.
-          </div>
+    <section className="site-inventory">
+      <div className="inventory-header">
+        <div>
+          <p className="eyebrow">Organization</p>
+          <h1>Sites</h1>
+        </div>
+        <div className="inventory-actions">
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => setShowCreate((visible) => !visible)}
+          >
+            <i className="bi bi-plus-lg" /> Add site
+          </button>
+          <Link className="btn btn-outline-secondary" to="/import">
+            <i className="bi bi-box-arrow-in-down" /> Import
+          </Link>
         </div>
       </div>
 
-      {error && (
-        <div className="col-12">
-          <div className="alert alert-danger mb-0">{error}</div>
+      <div className="inventory-tabs" role="tablist" aria-label="Site views">
+        <button className="active" type="button">
+          Results <span>{filteredSites.length}</span>
+        </button>
+        <button
+          className={showFilters ? 'active' : ''}
+          type="button"
+          onClick={() => setShowFilters((visible) => !visible)}
+        >
+          Filters
+        </button>
+      </div>
+
+      <div className="inventory-toolbar">
+        <label className="visually-hidden" htmlFor="site-search">
+          Quick search
+        </label>
+        <div className="input-group inventory-search">
+          <span className="input-group-text">
+            <i className="bi bi-search" />
+          </span>
+          <input
+            id="site-search"
+            className="form-control"
+            value={search}
+            placeholder="Quick search"
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+        <button
+          className="btn btn-outline-secondary ms-auto"
+          type="button"
+          onClick={() => setShowFilters((visible) => !visible)}
+        >
+          <i className="bi bi-funnel" /> Filter
+        </button>
+      </div>
+
+      {showFilters && (
+        <div className="inventory-filter-panel">
+          <label>
+            Status
+            <select
+              className="form-select"
+              value={status}
+              onChange={(event) => setStatus(event.target.value)}
+            >
+              <option value="">All statuses</option>
+              <option value="active">Active</option>
+              <option value="planned">Planned</option>
+              <option value="retired">Retired</option>
+            </select>
+          </label>
+          <label>
+            Region
+            <select
+              className="form-select"
+              value={regionId}
+              onChange={(event) => setRegionId(event.target.value)}
+            >
+              <option value="">All regions</option>
+              {(regionsQuery.data ?? []).map((region) => (
+                <option key={region.id} value={region.id}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="btn btn-link"
+            type="button"
+            onClick={() => {
+              setSearch('');
+              setStatus('');
+              setRegionId('');
+            }}
+          >
+            Clear filters
+          </button>
         </div>
       )}
 
-      <div id="regions" className="col-12 col-xl-6">
-        <div className="card h-100">
-          <div className="card-header">
-            <h2 className="card-title">Regions</h2>
-          </div>
-          <form
-            className="card-body border-bottom"
-            onSubmit={submit(() => regionMutation.mutate(regionForm))}
-          >
-            <HierarchyFields
-              form={regionForm}
-              parents={regionsQuery.data ?? []}
-              onChange={setRegionForm}
-              parentLabel="Parent region"
-            />
-            <SaveButton pending={regionMutation.isPending} label="Add region" />
-          </form>
-          <HierarchyList
-            items={regionsQuery.data ?? []}
-            empty="No regions yet."
-          />
-        </div>
-      </div>
+      {showCreate && (
+        <SiteCreateForm
+          form={form}
+          setForm={setForm}
+          regions={regionsQuery.data ?? []}
+          groups={groupsQuery.data ?? []}
+          pending={createMutation.isPending}
+          error={createMutation.error?.message}
+          onCancel={() => setShowCreate(false)}
+          onSubmit={(event) => {
+            event.preventDefault();
+            createMutation.mutate(form);
+          }}
+        />
+      )}
 
-      <div id="site-groups" className="col-12 col-xl-6">
-        <div className="card h-100">
-          <div className="card-header">
-            <h2 className="card-title">Site groups</h2>
-          </div>
-          <form
-            className="card-body border-bottom"
-            onSubmit={submit(() => siteGroupMutation.mutate(siteGroupForm))}
-          >
-            <HierarchyFields
-              form={siteGroupForm}
-              parents={groupsQuery.data ?? []}
-              onChange={setSiteGroupForm}
-              parentLabel="Parent group"
-            />
-            <SaveButton
-              pending={siteGroupMutation.isPending}
-              label="Add site group"
-            />
-          </form>
-          <HierarchyList
-            items={groupsQuery.data ?? []}
-            empty="No site groups yet."
-          />
+      {sitesQuery.error && (
+        <div className="alert alert-danger mt-3">
+          {sitesQuery.error.message}
         </div>
-      </div>
+      )}
 
-      <div id="sites" className="col-12">
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">Sites</h2>
-          </div>
-          <form
-            className="card-body border-bottom"
-            onSubmit={submit(() => siteMutation.mutate(siteForm))}
-          >
-            <div className="row g-3">
-              <TextField
-                label="Site name"
-                value={siteForm.name}
-                required
-                onChange={(name) => setSiteForm({ ...siteForm, name })}
-              />
-              <TextField
-                label="Slug"
-                value={siteForm.slug}
-                placeholder="Generated from name if blank"
-                onChange={(slug) => setSiteForm({ ...siteForm, slug })}
-              />
-              <SelectField
-                label="Status"
-                value={siteForm.status}
-                onChange={(status) =>
-                  setSiteForm({
-                    ...siteForm,
-                    status: facilityStatusSchema.parse(status),
-                  })
-                }
-                options={['active', 'planned', 'retired']}
-              />
-              <SelectField
-                label="Region"
-                value={siteForm.regionId}
-                onChange={(regionId) => setSiteForm({ ...siteForm, regionId })}
-                options={(regionsQuery.data ?? []).map((region) => ({
-                  value: region.id,
-                  label: region.name,
-                }))}
-                emptyLabel="No region"
-              />
-              <SelectField
-                label="Site group"
-                value={siteForm.groupId}
-                onChange={(groupId) => setSiteForm({ ...siteForm, groupId })}
-                options={(groupsQuery.data ?? []).map((group) => ({
-                  value: group.id,
-                  label: group.name,
-                }))}
-                emptyLabel="No site group"
-              />
-              <TextField
-                label="Facility ID"
-                value={siteForm.facility}
-                onChange={(facility) => setSiteForm({ ...siteForm, facility })}
-              />
-              <TextField
-                label="Time zone"
-                value={siteForm.timeZone}
-                placeholder="America/Chicago"
-                onChange={(timeZone) => setSiteForm({ ...siteForm, timeZone })}
-              />
-              <TextField
-                label="Latitude"
-                value={siteForm.latitude}
-                placeholder="41.878113"
-                onChange={(latitude) => setSiteForm({ ...siteForm, latitude })}
-              />
-              <TextField
-                label="Longitude"
-                value={siteForm.longitude}
-                placeholder="-87.629799"
-                onChange={(longitude) =>
-                  setSiteForm({ ...siteForm, longitude })
-                }
-              />
-              <TextField
-                label="Owner"
-                value={siteForm.owner}
-                onChange={(owner) => setSiteForm({ ...siteForm, owner })}
-              />
-              <TextAreaField
-                label="Description"
-                value={siteForm.description}
-                onChange={(description) =>
-                  setSiteForm({ ...siteForm, description })
-                }
-              />
-              <TextAreaField
-                label="Physical address"
-                value={siteForm.physicalAddress}
-                onChange={(physicalAddress) =>
-                  setSiteForm({ ...siteForm, physicalAddress })
-                }
-              />
-              <TextAreaField
-                label="Shipping address"
-                value={siteForm.shippingAddress}
-                onChange={(shippingAddress) =>
-                  setSiteForm({ ...siteForm, shippingAddress })
-                }
-              />
-            </div>
-            <SaveButton pending={siteMutation.isPending} label="Add site" />
-          </form>
-          <SiteList sites={sitesQuery.data ?? []} />
+      <div className="site-results-card">
+        <div className="table-responsive">
+          <table className="table site-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Status</th>
+                <th scope="col">Facility</th>
+                <th scope="col">Region</th>
+                <th scope="col">Site group</th>
+                <th scope="col">Time zone</th>
+                <th scope="col" aria-label="Actions" />
+              </tr>
+            </thead>
+            <tbody>
+              {filteredSites.map((site) => (
+                <tr key={site.id}>
+                  <td>
+                    <Link className="site-link" to={`/sites/${site.id}`}>
+                      {site.name}
+                    </Link>
+                    <div className="site-slug">{site.slug}</div>
+                  </td>
+                  <td>
+                    <StatusBadge status={site.status} />
+                  </td>
+                  <td>{site.facility ?? '—'}</td>
+                  <td>{site.regionName ?? '—'}</td>
+                  <td>{site.groupName ?? '—'}</td>
+                  <td>{site.timeZone ?? '—'}</td>
+                  <td className="text-end">
+                    <Link
+                      className="btn btn-sm btn-outline-secondary"
+                      to={`/sites/${site.id}`}
+                    >
+                      View <i className="bi bi-chevron-right" />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+              {!sitesQuery.isPending && filteredSites.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="empty-table">
+                    No sites match the current view.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="site-results-footer">
+          Showing {filteredSites.length} of {(sitesQuery.data ?? []).length}{' '}
+          site{(sitesQuery.data ?? []).length === 1 ? '' : 's'}
         </div>
       </div>
-
-      <div id="locations" className="col-12">
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">Locations</h2>
-          </div>
-          <form
-            className="card-body border-bottom"
-            onSubmit={submit(() => locationMutation.mutate(locationForm))}
-          >
-            <div className="row g-3">
-              <SelectField
-                label="Site"
-                required
-                value={locationForm.siteId}
-                onChange={(siteId) =>
-                  setLocationForm({ ...locationForm, siteId, parentId: '' })
-                }
-                options={(sitesQuery.data ?? []).map((site) => ({
-                  value: site.id,
-                  label: site.name,
-                }))}
-                emptyLabel="Select a site"
-              />
-              <TextField
-                label="Location name"
-                required
-                value={locationForm.name}
-                onChange={(name) => setLocationForm({ ...locationForm, name })}
-              />
-              <TextField
-                label="Slug"
-                value={locationForm.slug}
-                placeholder="Generated from name if blank"
-                onChange={(slug) => setLocationForm({ ...locationForm, slug })}
-              />
-              <SelectField
-                label="Status"
-                value={locationForm.status}
-                onChange={(status) =>
-                  setLocationForm({
-                    ...locationForm,
-                    status: facilityStatusSchema.parse(status),
-                  })
-                }
-                options={['active', 'planned', 'retired']}
-              />
-              <SelectField
-                label="Parent location"
-                value={locationForm.parentId}
-                onChange={(parentId) =>
-                  setLocationForm({ ...locationForm, parentId })
-                }
-                options={selectedLocationParents.map((location) => ({
-                  value: location.id,
-                  label: location.name,
-                }))}
-                emptyLabel="No parent location"
-              />
-              <TextField
-                label="Facility ID"
-                value={locationForm.facility}
-                onChange={(facility) =>
-                  setLocationForm({ ...locationForm, facility })
-                }
-              />
-              <TextField
-                label="Owner"
-                value={locationForm.owner}
-                onChange={(owner) =>
-                  setLocationForm({ ...locationForm, owner })
-                }
-              />
-              <TextAreaField
-                label="Description"
-                value={locationForm.description}
-                onChange={(description) =>
-                  setLocationForm({ ...locationForm, description })
-                }
-              />
-            </div>
-            <SaveButton
-              pending={locationMutation.isPending}
-              label="Add location"
-              disabled={!sitesQuery.data?.length}
-            />
-          </form>
-          <LocationList locations={locationsQuery.data ?? []} />
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
 
-function HierarchyFields({
+function SiteCreateForm({
   form,
-  parents,
-  onChange,
-  parentLabel,
+  setForm,
+  regions,
+  groups,
+  pending,
+  error,
+  onCancel,
+  onSubmit,
 }: {
-  form: typeof blankHierarchy;
-  parents: Array<{ id: string; name: string }>;
-  onChange: (form: typeof blankHierarchy) => void;
-  parentLabel: string;
+  form: typeof blankSite;
+  setForm: (form: typeof blankSite) => void;
+  regions: Array<{ id: string; name: string }>;
+  groups: Array<{ id: string; name: string }>;
+  pending: boolean;
+  error: string | undefined;
+  onCancel: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   return (
-    <div className="row g-3">
-      <TextField
-        label="Name"
-        value={form.name}
-        required
-        onChange={(name) => onChange({ ...form, name })}
-      />
-      <TextField
-        label="Slug"
-        value={form.slug}
-        placeholder="Generated from name if blank"
-        onChange={(slug) => onChange({ ...form, slug })}
-      />
-      <SelectField
-        label={parentLabel}
-        value={form.parentId}
-        onChange={(parentId) => onChange({ ...form, parentId })}
-        options={parents.map((parent) => ({
-          value: parent.id,
-          label: parent.name,
-        }))}
-        emptyLabel="No parent"
-      />
-      <TextField
-        label="Owner"
-        value={form.owner}
-        onChange={(owner) => onChange({ ...form, owner })}
-      />
-      <TextAreaField
-        label="Description"
-        value={form.description}
-        onChange={(description) => onChange({ ...form, description })}
-      />
-    </div>
+    <form className="site-create-card" onSubmit={onSubmit}>
+      <div className="card-header">
+        <h2>Add site</h2>
+        <button className="btn-close" type="button" onClick={onCancel} />
+      </div>
+      <div className="card-body row g-3">
+        <Field
+          label="Name"
+          required
+          value={form.name}
+          onChange={(name) => setForm({ ...form, name })}
+        />
+        <Field
+          label="Slug"
+          value={form.slug}
+          placeholder="Generated from name"
+          onChange={(slug) => setForm({ ...form, slug })}
+        />
+        <Select
+          label="Status"
+          value={form.status}
+          onChange={(status) =>
+            setForm({ ...form, status: facilityStatusSchema.parse(status) })
+          }
+          options={['active', 'planned', 'retired']}
+        />
+        <Select
+          label="Region"
+          value={form.regionId}
+          onChange={(regionId) => setForm({ ...form, regionId })}
+          empty="No region"
+          options={regions.map((region) => ({
+            value: region.id,
+            label: region.name,
+          }))}
+        />
+        <Select
+          label="Site group"
+          value={form.groupId}
+          onChange={(groupId) => setForm({ ...form, groupId })}
+          empty="No site group"
+          options={groups.map((group) => ({
+            value: group.id,
+            label: group.name,
+          }))}
+        />
+        <Field
+          label="Facility ID"
+          value={form.facility}
+          onChange={(facility) => setForm({ ...form, facility })}
+        />
+        <Field
+          label="Time zone"
+          value={form.timeZone}
+          placeholder="America/Chicago"
+          onChange={(timeZone) => setForm({ ...form, timeZone })}
+        />
+        <Field
+          label="Owner"
+          value={form.owner}
+          onChange={(owner) => setForm({ ...form, owner })}
+        />
+        <Field
+          label="Latitude"
+          value={form.latitude}
+          onChange={(latitude) => setForm({ ...form, latitude })}
+        />
+        <Field
+          label="Longitude"
+          value={form.longitude}
+          onChange={(longitude) => setForm({ ...form, longitude })}
+        />
+        <TextArea
+          label="Description"
+          value={form.description}
+          onChange={(description) => setForm({ ...form, description })}
+        />
+        <TextArea
+          label="Physical address"
+          value={form.physicalAddress}
+          onChange={(physicalAddress) => setForm({ ...form, physicalAddress })}
+        />
+        <TextArea
+          label="Shipping address"
+          value={form.shippingAddress}
+          onChange={(shippingAddress) => setForm({ ...form, shippingAddress })}
+        />
+      </div>
+      <div className="card-footer d-flex align-items-center gap-2">
+        <button className="btn btn-primary" type="submit" disabled={pending}>
+          {pending ? 'Saving…' : 'Save site'}
+        </button>
+        <button
+          className="btn btn-outline-secondary"
+          type="button"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+        {error && <span className="text-danger small">{error}</span>}
+      </div>
+    </form>
   );
 }
 
-function TextField({
+function Field({
   label,
   value,
   onChange,
@@ -554,19 +417,20 @@ function TextField({
   placeholder?: string;
 }) {
   return (
-    <div className="col-12 col-md-6">
-      <label className="form-label">{label}</label>
+    <label className="col-12 col-md-6 form-label">
+      {label}
       <input
-        className="form-control"
+        className="form-control mt-1"
         value={value}
         required={required}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
       />
-    </div>
+    </label>
   );
 }
-function TextAreaField({
+
+function TextArea({
   label,
   value,
   onChange,
@@ -576,42 +440,40 @@ function TextAreaField({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="col-12 col-md-6">
-      <label className="form-label">{label}</label>
+    <label className="col-12 col-md-6 form-label">
+      {label}
       <textarea
-        className="form-control"
+        className="form-control mt-1"
         rows={2}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
-    </div>
+    </label>
   );
 }
-function SelectField({
+
+function Select({
   label,
   value,
   onChange,
   options,
-  emptyLabel,
-  required,
+  empty,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: Array<string | { value: string; label: string }>;
-  emptyLabel?: string;
-  required?: boolean;
+  empty?: string;
 }) {
   return (
-    <div className="col-12 col-md-6">
-      <label className="form-label">{label}</label>
+    <label className="col-12 col-md-6 form-label">
+      {label}
       <select
-        className="form-select"
+        className="form-select mt-1"
         value={value}
-        required={required}
         onChange={(event) => onChange(event.target.value)}
       >
-        {emptyLabel && <option value="">{emptyLabel}</option>}
+        {empty && <option value="">{empty}</option>}
         {options.map((option) => {
           const item =
             typeof option === 'string'
@@ -624,184 +486,10 @@ function SelectField({
           );
         })}
       </select>
-    </div>
+    </label>
   );
 }
-function SaveButton({
-  pending,
-  label,
-  disabled,
-}: {
-  pending: boolean;
-  label: string;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      className="btn btn-primary mt-3"
-      type="submit"
-      disabled={pending || disabled}
-    >
-      {pending ? 'Saving…' : label}
-    </button>
-  );
-}
-function HierarchyList({
-  items,
-  empty,
-}: {
-  items: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    parentId: string | null;
-    description: string | null;
-  }>;
-  empty: string;
-}) {
-  return (
-    <div className="card-body table-responsive p-0">
-      <table className="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Slug</th>
-            <th>Parent</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
-              <td>{item.name}</td>
-              <td>
-                <code>{item.slug}</code>
-              </td>
-              <td>
-                {items.find((candidate) => candidate.id === item.parentId)
-                  ?.name ?? '—'}
-              </td>
-              <td>{item.description ?? '—'}</td>
-            </tr>
-          ))}
-          {items.length === 0 && (
-            <tr>
-              <td colSpan={4} className="text-center text-secondary py-4">
-                {empty}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-function SiteList({
-  sites,
-}: {
-  sites: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    status: string;
-    regionName: string | null;
-    groupName: string | null;
-    facility: string | null;
-    timeZone: string | null;
-  }>;
-}) {
-  return (
-    <div className="card-body table-responsive p-0">
-      <table className="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th>Site</th>
-            <th>Status</th>
-            <th>Region</th>
-            <th>Group</th>
-            <th>Facility</th>
-            <th>Time zone</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sites.map((site) => (
-            <tr key={site.id}>
-              <td>
-                <div>{site.name}</div>
-                <code className="small">{site.slug}</code>
-              </td>
-              <td>
-                <span
-                  className={`badge text-bg-${site.status === 'active' ? 'success' : site.status === 'planned' ? 'warning' : 'secondary'}`}
-                >
-                  {site.status}
-                </span>
-              </td>
-              <td>{site.regionName ?? '—'}</td>
-              <td>{site.groupName ?? '—'}</td>
-              <td>{site.facility ?? '—'}</td>
-              <td>{site.timeZone ?? '—'}</td>
-            </tr>
-          ))}
-          {sites.length === 0 && (
-            <tr>
-              <td colSpan={6} className="text-center text-secondary py-4">
-                No sites yet.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-function LocationList({
-  locations,
-}: {
-  locations: Array<{
-    id: string;
-    siteName: string;
-    name: string;
-    slug: string;
-    status: string;
-    parentName: string | null;
-    facility: string | null;
-  }>;
-}) {
-  return (
-    <div className="card-body table-responsive p-0">
-      <table className="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Site</th>
-            <th>Status</th>
-            <th>Parent</th>
-            <th>Facility</th>
-          </tr>
-        </thead>
-        <tbody>
-          {locations.map((location) => (
-            <tr key={location.id}>
-              <td>
-                <div>{location.name}</div>
-                <code className="small">{location.slug}</code>
-              </td>
-              <td>{location.siteName}</td>
-              <td>{location.status}</td>
-              <td>{location.parentName ?? '—'}</td>
-              <td>{location.facility ?? '—'}</td>
-            </tr>
-          ))}
-          {locations.length === 0 && (
-            <tr>
-              <td colSpan={5} className="text-center text-secondary py-4">
-                No locations yet.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
+
+export function StatusBadge({ status }: { status: string }) {
+  return <span className={`status-badge status-${status}`}>{status}</span>;
 }

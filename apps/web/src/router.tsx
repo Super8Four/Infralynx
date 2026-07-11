@@ -35,6 +35,13 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'sites/:siteId',
+        lazy: async () => {
+          const module = await import('./routes/SiteDetail');
+          return { Component: module.SiteDetail };
+        },
+      },
+      {
         path: 'ipam/:page',
         lazy: async () => {
           const module = await import('./routes/Placeholder');
