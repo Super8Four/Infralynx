@@ -8,6 +8,13 @@
       "when": 1783718665623,
       "tag": "0000_clean_toro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783734522058,
+      "tag": "0001_seed_defaults",
+      "breakpoints": true
     }
   ]
 }

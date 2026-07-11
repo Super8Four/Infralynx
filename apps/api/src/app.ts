@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 
 import { pool } from './db/client.js';
 import { openApiDocument } from './openapi.js';
+import { ipamRouter } from './routes/ipam.js';
 
 export function createApp() {
   const app = express();
@@ -48,6 +49,7 @@ export function createApp() {
   app.get('/api/v1/openapi.json', (_request, response) => {
     response.json(openApiDocument);
   });
+  app.use('/api/v1/ipam', ipamRouter);
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
   app.use((_request, response) => {

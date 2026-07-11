@@ -22,4 +22,14 @@ describe('Infralynx API', () => {
       .parse(response.body as unknown);
     expect(document.info.title).toBe('Infralynx API');
   });
+
+  it('rejects invalid prefix data before querying PostgreSQL', async () => {
+    const response = await request(createApp())
+      .post('/api/v1/ipam/prefixes')
+      .send({ cidr: 'not-a-prefix' })
+      .expect(400);
+    expect(response.body).toMatchObject({
+      error: { code: 'validation_error' },
+    });
+  });
 });
