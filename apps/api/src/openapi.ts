@@ -23,6 +23,49 @@ export const openApiDocument = {
         },
       },
     },
+    '/ipam/sites': {
+      get: {
+        summary: 'List sites',
+        responses: { '200': { description: 'Sites' } },
+      },
+    },
+    '/ipam/vrfs': {
+      get: {
+        summary: 'List VRFs',
+        responses: { '200': { description: 'VRFs' } },
+      },
+    },
+    '/ipam/prefixes': {
+      get: {
+        summary: 'List prefixes',
+        responses: { '200': { description: 'Prefixes' } },
+      },
+      post: {
+        summary: 'Create a prefix',
+        responses: {
+          '201': { description: 'Prefix created' },
+          '400': { description: 'Invalid prefix' },
+          '409': { description: 'Prefix already exists' },
+        },
+      },
+    },
+    '/ipam/prefixes/{id}': {
+      delete: {
+        summary: 'Delete a prefix',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' },
+          },
+        ],
+        responses: {
+          '204': { description: 'Prefix deleted' },
+          '404': { description: 'Not found' },
+        },
+      },
+    },
   },
   components: {
     schemas: {
