@@ -1,9 +1,11 @@
 import {
+  type AnyPgColumn,
   boolean,
   cidr,
   inet,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   primaryKey,
@@ -29,6 +31,11 @@ export const resourceStatus = pgEnum('resource_status', [
   'reserved',
   'deprecated',
   'available',
+]);
+export const facilityStatus = pgEnum('facility_status', [
+  'active',
+  'planned',
+  'retired',
 ]);
 export const auditAction = pgEnum('audit_action', [
   'create',
@@ -110,13 +117,98 @@ export const sessions = pgTable('sessions', {
     .defaultNow(),
 });
 
+export const regions = pgTable(
+  'regions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: varchar('name', { length: 100 }).notNull(),
+    slug: varchar('slug', { length: 100 }).notNull().unique(),
+    parentId: uuid('parent_id').references((): AnyPgColumn => regions.id, {
+      onDelete: 'set null',
+    }),
+    description: text('description'),
+    owner: varchar('owner', { length: 200 }),
+    comments: text('comments'),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex('regions_parent_name_unique').on(table.parentId, table.name),
+  ],
+);
+
+export const siteGroups = pgTable(
+  'site_groups',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: varchar('name', { length: 100 }).notNull(),
+    slug: varchar('slug', { length: 100 }).notNull().unique(),
+    parentId: uuid('parent_id').references((): AnyPgColumn => siteGroups.id, {
+      onDelete: 'set null',
+    }),
+    description: text('description'),
+    owner: varchar('owner', { length: 200 }),
+    comments: text('comments'),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex('site_groups_parent_name_unique').on(
+      table.parentId,
+      table.name,
+    ),
+  ],
+);
+
 export const sites = pgTable('sites', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 100 }).notNull(),
   slug: varchar('slug', { length: 100 }).notNull().unique(),
+  status: facilityStatus('status').notNull().default('active'),
+  regionId: uuid('region_id').references(() => regions.id, {
+    onDelete: 'set null',
+  }),
+  groupId: uuid('group_id').references(() => siteGroups.id, {
+    onDelete: 'set null',
+  }),
+  facility: varchar('facility', { length: 100 }),
+  timeZone: varchar('time_zone', { length: 100 }),
   description: text('description'),
+  physicalAddress: text('physical_address'),
+  shippingAddress: text('shipping_address'),
+  latitude: numeric('latitude', { precision: 9, scale: 6 }),
+  longitude: numeric('longitude', { precision: 9, scale: 6 }),
+  owner: varchar('owner', { length: 200 }),
+  comments: text('comments'),
   ...timestamps,
 });
+
+export const locations = pgTable(
+  'locations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    siteId: uuid('site_id')
+      .notNull()
+      .references(() => sites.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 100 }).notNull(),
+    slug: varchar('slug', { length: 100 }).notNull(),
+    status: facilityStatus('status').notNull().default('active'),
+    parentId: uuid('parent_id').references((): AnyPgColumn => locations.id, {
+      onDelete: 'set null',
+    }),
+    facility: varchar('facility', { length: 100 }),
+    description: text('description'),
+    owner: varchar('owner', { length: 200 }),
+    comments: text('comments'),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex('locations_site_slug_unique').on(table.siteId, table.slug),
+    uniqueIndex('locations_site_parent_name_unique').on(
+      table.siteId,
+      table.parentId,
+      table.name,
+    ),
+  ],
+);
 
 export const vrfs = pgTable(
   'vrfs',

@@ -38,9 +38,10 @@ npm test
 npm run build
 ```
 
-The project is at version `0.1.0`. The dashboard, health API, OpenAPI document,
-initial Drizzle schema, storage abstraction, tests, and production containers
-are scaffolded. IPAM CRUD and authentication are the next feature work.
+The project is at version `0.1.0`. The working demo includes PostgreSQL-backed
+IPAM prefix inventory and facilities site management: hierarchical regions,
+site groups, sites, and nested locations. Racks, equipment, and authentication
+remain future work.
 
 ## License
 

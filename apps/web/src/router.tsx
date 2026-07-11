@@ -27,6 +27,13 @@ export const router = createBrowserRouter([
           return { Component: module.Prefixes };
         },
       },
+      {
+        path: 'sites',
+        lazy: async () => {
+          const module = await import('./routes/Facilities');
+          return { Component: module.Facilities };
+        },
+      },
     ],
   },
 ]);

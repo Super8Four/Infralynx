@@ -13,5 +13,7 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - IPAM domain schema, OpenAPI health endpoint, AdminLTE dashboard, and tests.
 - Apache License 2.0 project licensing and attribution notice.
 - PostgreSQL-backed prefix creation, listing, deletion, and audit events.
+- Facilities site management: hierarchical regions, site groups, sites, and
+  site locations, with PostgreSQL persistence and audit events.
 
 [Unreleased]: https://github.com/Super8Four/Infralynx/compare/v0.1.0...HEAD

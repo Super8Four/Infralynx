@@ -86,6 +86,24 @@ number constraints must be enforced in the database where practical. DNS,
 DHCP, RIR synchronization, discovery, and multi-tenant ownership are later
 features and are not part of the first usable release.
 
+## Facilities site management
+
+The first facilities workflow establishes the organizational context used by
+IPAM without beginning DCIM inventory. It includes two independent, recursive
+hierarchies: **regions** for geographic organization and **site groups** for
+functional organization. A site may belong to either, both, or neither.
+
+Sites record an operational status, facility identifier, time zone, physical
+and shipping addresses, decimal GPS coordinates, description, ownership, and
+comments. Locations are optional, recursively nested subdivisions within one
+site (for example, a floor and a room). A location's parent must belong to the
+same site.
+
+This release intentionally excludes tenants, tags, contacts, racks, rack
+roles, rack groups, devices, and equipment relationships. Those are either a
+future multi-tenancy/contact capability or DCIM scope. All facilities mutations
+produce audit events, and site slugs are generated from names when omitted.
+
 ## Audit history
 
 Every create, update, delete, assignment, authentication event, and permission
