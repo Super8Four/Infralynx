@@ -35,6 +35,13 @@ export function AppLayout() {
                   <p>Dashboard</p>
                 </NavLink>
               </li>
+              <li className="nav-header">FACILITIES</li>
+              <li className="nav-item">
+                <NavLink to="/sites" className="nav-link">
+                  <i className="nav-icon bi bi-buildings" />
+                  <p>Site management</p>
+                </NavLink>
+              </li>
               <li className="nav-header">IPAM</li>
               <li className="nav-item">
                 <NavLink to="/prefixes" className="nav-link">

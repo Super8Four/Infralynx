@@ -32,4 +32,14 @@ describe('Infralynx API', () => {
       error: { code: 'validation_error' },
     });
   });
+
+  it('rejects invalid facility data before querying PostgreSQL', async () => {
+    const response = await request(createApp())
+      .post('/api/v1/facilities/sites')
+      .send({ name: '' })
+      .expect(400);
+    expect(response.body).toMatchObject({
+      error: { code: 'validation_error' },
+    });
+  });
 });
