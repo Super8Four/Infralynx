@@ -27,3 +27,7 @@ docs: explain the backup procedure
 
 The pull request title becomes the commit on `main` when the pull request is
 squash-merged.
+
+Unless explicitly stated otherwise, contributions intentionally submitted for
+inclusion in Infralynx are provided under the Apache License 2.0, as described
+in Section 5 of the license.
