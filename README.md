@@ -41,3 +41,10 @@ npm run build
 The project is at version `0.1.0`. The dashboard, health API, OpenAPI document,
 initial Drizzle schema, storage abstraction, tests, and production containers
 are scaffolded. IPAM CRUD and authentication are the next feature work.
+
+## License
+
+Copyright 2026 Gabe Jensen. Infralynx is licensed under the
+[Apache License 2.0](LICENSE). The license permits commercial use,
+modification, and redistribution subject to its terms. It does not grant rights
+to project trademarks.

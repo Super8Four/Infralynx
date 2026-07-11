@@ -11,5 +11,6 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 - Initial Node.js, React, Express, PostgreSQL, and Docker scaffold.
 - IPAM domain schema, OpenAPI health endpoint, AdminLTE dashboard, and tests.
+- Apache License 2.0 project licensing and attribution notice.
 
 [Unreleased]: https://github.com/Super8Four/Infralynx/compare/v0.1.0...HEAD

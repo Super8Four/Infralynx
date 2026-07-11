@@ -49,6 +49,7 @@ it whenever a decision is made or materially changed.
 | Initial IPAM model         | Sites, VRFs, prefixes, IP addresses, VLANs, statuses, and tags | Support hierarchical addressing and descriptive ownership metadata.                                     |
 | Audit history              | Immutable application audit events                             | Record every data mutation plus authentication and permission changes.                                  |
 | Release versioning         | Semantic Versioning                                            | Begin at `0.1.0`; tag releases and container images with immutable versions.                            |
+| Source license             | Apache License 2.0                                             | Permit commercial use, modification, and redistribution with notice and patent terms.                   |
 | Upgrade policy             | Explicit forward-only migrations                               | Back up PostgreSQL before upgrades; downgrade by restoring the backup and prior image.                  |
 | File storage               | Pluggable local or S3-compatible backend                       | Default to persistent local storage; allow S3-compatible storage without changing application features. |
 | Containers                 | Docker and Docker Compose                                      | Compose will be the canonical local workflow.                                                           |
