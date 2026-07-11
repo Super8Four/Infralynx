@@ -167,6 +167,22 @@ inventory and visualization features would require additional browser-side
 code. Search-engine optimization is not a deciding factor for this
 authenticated application.
 
+### Visual design system
+
+Infralynx uses a dark operational interface designed for inventory-dense
+workflows. The core palette is Gunmetal (`#263238`) for the application shell,
+Salty Dog blue (`#234058`) for elevated surfaces and primary actions, and
+Crimson (`#B3203B`) for destructive actions and retired status. Functional
+success and warning colors remain distinct from the brand palette so resource
+state is readable at a glance.
+
+List and detail views follow the established inventory pattern: quick search,
+filters, compact results tables, a dedicated object detail view, and related
+object counts. The site view exposes only relationships that exist in the
+product: regions, site groups, locations, and IPAM prefixes. Future DCIM
+relationships must not be represented as active inventory until their models
+and workflows exist.
+
 ## Authentication direction
 
 The first release will authenticate locally managed users. Passwords must only
