@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { healthResponseSchema } from './health.js';
-import { cidrSchema } from './ipam.js';
+import { cidrSchema, regionSchema } from './ipam.js';
 
 describe('healthResponseSchema', () => {
   it('accepts the API health response contract', () => {
@@ -26,4 +26,20 @@ describe('cidrSchema', () => {
     'rejects %s',
     (cidr) => expect(cidrSchema.safeParse(cidr).success).toBe(false),
   );
+});
+
+describe('regionSchema', () => {
+  it('accepts nullable optional fields returned by PostgreSQL', () => {
+    expect(
+      regionSchema.safeParse({
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Validation Region',
+        slug: 'validation-region',
+        parentId: null,
+        description: null,
+        owner: null,
+        comments: null,
+      }).success,
+    ).toBe(true);
+  });
 });

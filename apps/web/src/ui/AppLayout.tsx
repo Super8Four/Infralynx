@@ -35,19 +35,183 @@ export function AppLayout() {
                   <p>Dashboard</p>
                 </NavLink>
               </li>
-              <li className="nav-header">FACILITIES</li>
-              <li className="nav-item">
-                <NavLink to="/sites" className="nav-link">
+              <li className="nav-header">ORGANIZATION</li>
+              <li className="nav-item menu-open">
+                <span className="nav-link">
                   <i className="nav-icon bi bi-buildings" />
-                  <p>Site management</p>
+                  <p>
+                    Sites
+                    <i className="nav-arrow bi bi-chevron-right" />
+                  </p>
+                </span>
+                <ul className="nav nav-treeview">
+                  <li className="nav-item">
+                    <NavLink to="/sites" className="nav-link">
+                      <i className="nav-icon bi bi-building" />
+                      <p>Sites</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/sites#locations" className="nav-link">
+                      <i className="nav-icon bi bi-geo-alt" />
+                      <p>Locations</p>
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+
+              <li className="nav-header">IPAM</li>
+              <li className="nav-item menu-open">
+                <span className="nav-link">
+                  <i className="nav-icon bi bi-diagram-3" />
+                  <p>
+                    IPAM
+                    <i className="nav-arrow bi bi-chevron-right" />
+                  </p>
+                </span>
+                <ul className="nav nav-treeview">
+                  <li className="nav-item">
+                    <NavLink to="/ipam/addresses" className="nav-link">
+                      <i className="nav-icon bi bi-hdd-network" />
+                      <p>Addresses</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/prefixes" className="nav-link">
+                      <i className="nav-icon bi bi-diagram-3" />
+                      <p>Prefixes</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/ipam/asns" className="nav-link">
+                      <i className="nav-icon bi bi-globe2" />
+                      <p>ASNs</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/ipam/aggregates" className="nav-link">
+                      <i className="nav-icon bi bi-signpost-split" />
+                      <p>Aggregates</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/ipam/vrfs" className="nav-link">
+                      <i className="nav-icon bi bi-shuffle" />
+                      <p>VRFs</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/ipam/vlans" className="nav-link">
+                      <i className="nav-icon bi bi-bezier2" />
+                      <p>VLANs</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/ipam/other" className="nav-link">
+                      <i className="nav-icon bi bi-three-dots" />
+                      <p>Other</p>
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+
+              <li className="nav-item">
+                <NavLink to="/import" className="nav-link">
+                  <i className="nav-icon bi bi-box-arrow-in-down" />
+                  <p>Import</p>
                 </NavLink>
               </li>
-              <li className="nav-header">IPAM</li>
               <li className="nav-item">
-                <NavLink to="/prefixes" className="nav-link">
-                  <i className="nav-icon bi bi-diagram-3" />
-                  <p>Prefixes</p>
+                <NavLink to="/tags" className="nav-link">
+                  <i className="nav-icon bi bi-tags" />
+                  <p>Tags</p>
                 </NavLink>
+              </li>
+
+              <li className="nav-header">SETTINGS</li>
+              <li className="nav-item menu-open">
+                <span className="nav-link">
+                  <i className="nav-icon bi bi-gear" />
+                  <p>
+                    Settings
+                    <i className="nav-arrow bi bi-chevron-right" />
+                  </p>
+                </span>
+                <ul className="nav nav-treeview">
+                  <li className="nav-item menu-open">
+                    <span className="nav-link">
+                      <i className="nav-icon bi bi-shield-lock" />
+                      <p>
+                        Administration
+                        <i className="nav-arrow bi bi-chevron-right" />
+                      </p>
+                    </span>
+                    <ul className="nav nav-treeview">
+                      <li className="nav-item">
+                        <NavLink to="/settings/users" className="nav-link">
+                          <i className="nav-icon bi bi-person" />
+                          <p>Users</p>
+                        </NavLink>
+                      </li>
+                      <li className="nav-item">
+                        <NavLink to="/settings/groups" className="nav-link">
+                          <i className="nav-icon bi bi-people" />
+                          <p>Groups</p>
+                        </NavLink>
+                      </li>
+                      <li className="nav-item">
+                        <NavLink to="/settings/api-tokens" className="nav-link">
+                          <i className="nav-icon bi bi-key" />
+                          <p>API tokens</p>
+                        </NavLink>
+                      </li>
+                      <li className="nav-item">
+                        <NavLink
+                          to="/settings/permissions"
+                          className="nav-link"
+                        >
+                          <i className="nav-icon bi bi-shield-check" />
+                          <p>Permissions</p>
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                  <li className="nav-item menu-open">
+                    <span className="nav-link">
+                      <i className="nav-icon bi bi-diagram-2" />
+                      <p>
+                        Organization
+                        <i className="nav-arrow bi bi-chevron-right" />
+                      </p>
+                    </span>
+                    <ul className="nav nav-treeview">
+                      <li className="nav-item">
+                        <NavLink to="/settings/tenants" className="nav-link">
+                          <i className="nav-icon bi bi-person-workspace" />
+                          <p>Tenants</p>
+                        </NavLink>
+                      </li>
+                      <li className="nav-item">
+                        <NavLink to="/sites#regions" className="nav-link">
+                          <i className="nav-icon bi bi-globe-americas" />
+                          <p>Regions</p>
+                        </NavLink>
+                      </li>
+                      <li className="nav-item">
+                        <NavLink to="/sites#site-groups" className="nav-link">
+                          <i className="nav-icon bi bi-collection" />
+                          <p>Site groups</p>
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/settings/system" className="nav-link">
+                      <i className="nav-icon bi bi-cpu" />
+                      <p>System</p>
+                    </NavLink>
+                  </li>
+                </ul>
               </li>
             </ul>
           </nav>
