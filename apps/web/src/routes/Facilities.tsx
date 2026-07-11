@@ -236,7 +236,7 @@ export function Facilities() {
         </div>
       )}
 
-      <div className="col-12 col-xl-6">
+      <div id="regions" className="col-12 col-xl-6">
         <div className="card h-100">
           <div className="card-header">
             <h2 className="card-title">Regions</h2>
@@ -260,7 +260,7 @@ export function Facilities() {
         </div>
       </div>
 
-      <div className="col-12 col-xl-6">
+      <div id="site-groups" className="col-12 col-xl-6">
         <div className="card h-100">
           <div className="card-header">
             <h2 className="card-title">Site groups</h2>
@@ -287,7 +287,7 @@ export function Facilities() {
         </div>
       </div>
 
-      <div className="col-12">
+      <div id="sites" className="col-12">
         <div className="card">
           <div className="card-header">
             <h2 className="card-title">Sites</h2>
@@ -398,7 +398,7 @@ export function Facilities() {
         </div>
       </div>
 
-      <div className="col-12">
+      <div id="locations" className="col-12">
         <div className="card">
           <div className="card-header">
             <h2 className="card-title">Locations</h2>

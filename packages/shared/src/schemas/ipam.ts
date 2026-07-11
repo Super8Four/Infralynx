@@ -25,6 +25,8 @@ const optionalText = (max: number) =>
     .max(max)
     .transform((value) => value || null);
 
+const nullableText = (max: number) => z.string().max(max).nullable();
+
 const optionalCoordinate = (minimum: number, maximum: number) =>
   z
     .union([z.string(), z.number()])
@@ -49,7 +51,12 @@ const hierarchyFields = {
 
 export const regionSchema = z.object({
   id: z.uuid(),
-  ...hierarchyFields,
+  name: z.string().trim().min(1).max(100),
+  slug: slugSchema,
+  parentId: z.uuid().nullable(),
+  description: nullableText(1000),
+  owner: nullableText(200),
+  comments: nullableText(10_000),
 });
 export const createRegionSchema = z.object({
   ...hierarchyFields,
@@ -58,7 +65,12 @@ export const createRegionSchema = z.object({
 
 export const siteGroupSchema = z.object({
   id: z.uuid(),
-  ...hierarchyFields,
+  name: z.string().trim().min(1).max(100),
+  slug: slugSchema,
+  parentId: z.uuid().nullable(),
+  description: nullableText(1000),
+  owner: nullableText(200),
+  comments: nullableText(10_000),
 });
 export const createSiteGroupSchema = z.object({
   ...hierarchyFields,
