@@ -1,6 +1,16 @@
 import { NavLink, Outlet } from 'react-router';
+import { useState } from 'react';
 
 export function AppLayout() {
+  const [open, setOpen] = useState({
+    sites: true,
+    ipam: true,
+    settings: true,
+    administration: false,
+    organization: false,
+  });
+  const toggle = (section: keyof typeof open) =>
+    setOpen((current) => ({ ...current, [section]: !current[section] }));
   return (
     <div className="app-wrapper">
       <nav className="app-header navbar navbar-expand bg-body">
@@ -36,14 +46,19 @@ export function AppLayout() {
                 </NavLink>
               </li>
               <li className="nav-header">ORGANIZATION</li>
-              <li className="nav-item menu-open">
-                <span className="nav-link">
+              <li className={`nav-item ${open.sites ? 'menu-open' : ''}`}>
+                <button
+                  className="nav-link sidebar-toggle"
+                  type="button"
+                  onClick={() => toggle('sites')}
+                  aria-expanded={open.sites}
+                >
                   <i className="nav-icon bi bi-buildings" />
                   <p>
                     Sites
                     <i className="nav-arrow bi bi-chevron-right" />
                   </p>
-                </span>
+                </button>
                 <ul className="nav nav-treeview">
                   <li className="nav-item">
                     <NavLink to="/sites" className="nav-link">
@@ -61,14 +76,19 @@ export function AppLayout() {
               </li>
 
               <li className="nav-header">IPAM</li>
-              <li className="nav-item menu-open">
-                <span className="nav-link">
+              <li className={`nav-item ${open.ipam ? 'menu-open' : ''}`}>
+                <button
+                  className="nav-link sidebar-toggle"
+                  type="button"
+                  onClick={() => toggle('ipam')}
+                  aria-expanded={open.ipam}
+                >
                   <i className="nav-icon bi bi-diagram-3" />
                   <p>
                     IPAM
                     <i className="nav-arrow bi bi-chevron-right" />
                   </p>
-                </span>
+                </button>
                 <ul className="nav nav-treeview">
                   <li className="nav-item">
                     <NavLink to="/ipam/addresses" className="nav-link">
@@ -129,23 +149,35 @@ export function AppLayout() {
               </li>
 
               <li className="nav-header">SETTINGS</li>
-              <li className="nav-item menu-open">
-                <span className="nav-link">
+              <li className={`nav-item ${open.settings ? 'menu-open' : ''}`}>
+                <button
+                  className="nav-link sidebar-toggle"
+                  type="button"
+                  onClick={() => toggle('settings')}
+                  aria-expanded={open.settings}
+                >
                   <i className="nav-icon bi bi-gear" />
                   <p>
                     Settings
                     <i className="nav-arrow bi bi-chevron-right" />
                   </p>
-                </span>
+                </button>
                 <ul className="nav nav-treeview">
-                  <li className="nav-item menu-open">
-                    <span className="nav-link">
+                  <li
+                    className={`nav-item ${open.administration ? 'menu-open' : ''}`}
+                  >
+                    <button
+                      className="nav-link sidebar-toggle"
+                      type="button"
+                      onClick={() => toggle('administration')}
+                      aria-expanded={open.administration}
+                    >
                       <i className="nav-icon bi bi-shield-lock" />
                       <p>
                         Administration
                         <i className="nav-arrow bi bi-chevron-right" />
                       </p>
-                    </span>
+                    </button>
                     <ul className="nav nav-treeview">
                       <li className="nav-item">
                         <NavLink to="/settings/users" className="nav-link">
@@ -176,14 +208,21 @@ export function AppLayout() {
                       </li>
                     </ul>
                   </li>
-                  <li className="nav-item menu-open">
-                    <span className="nav-link">
+                  <li
+                    className={`nav-item ${open.organization ? 'menu-open' : ''}`}
+                  >
+                    <button
+                      className="nav-link sidebar-toggle"
+                      type="button"
+                      onClick={() => toggle('organization')}
+                      aria-expanded={open.organization}
+                    >
                       <i className="nav-icon bi bi-diagram-2" />
                       <p>
                         Organization
                         <i className="nav-arrow bi bi-chevron-right" />
                       </p>
-                    </span>
+                    </button>
                     <ul className="nav nav-treeview">
                       <li className="nav-item">
                         <NavLink to="/settings/tenants" className="nav-link">

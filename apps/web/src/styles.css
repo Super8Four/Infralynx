@@ -55,6 +55,20 @@ body,
   color: #fff !important;
 }
 
+.app-sidebar .sidebar-toggle {
+  border: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.app-sidebar .sidebar-toggle .nav-arrow {
+  transition: transform 0.15s ease-in-out;
+}
+
+.app-sidebar .menu-open > .sidebar-toggle .nav-arrow {
+  transform: rotate(90deg);
+}
+
 .app-sidebar .nav-treeview .nav-link {
   color: var(--infralynx-muted) !important;
 }
