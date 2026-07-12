@@ -222,6 +222,41 @@ export const vrfs = pgTable(
   (table) => [uniqueIndex('vrfs_name_unique').on(table.name)],
 );
 
+export const rirs = pgTable('rirs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 100 }).notNull(),
+  slug: varchar('slug', { length: 100 }).notNull().unique(),
+  description: text('description'),
+  ...timestamps,
+});
+
+export const aggregates = pgTable(
+  'aggregates',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    rirId: uuid('rir_id')
+      .notNull()
+      .references(() => rirs.id, { onDelete: 'restrict' }),
+    prefix: cidr('prefix').notNull().unique(),
+    family: addressFamily('family').notNull(),
+    status: resourceStatus('status').notNull().default('active'),
+    description: text('description'),
+    owner: varchar('owner', { length: 200 }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex('aggregates_rir_prefix_unique').on(table.rirId, table.prefix),
+  ],
+);
+
+export const prefixRoles = pgTable('prefix_roles', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+  slug: varchar('slug', { length: 100 }).notNull().unique(),
+  description: text('description'),
+  ...timestamps,
+});
+
 export const prefixes = pgTable(
   'prefixes',
   {
@@ -232,7 +267,15 @@ export const prefixes = pgTable(
     siteId: uuid('site_id').references(() => sites.id, {
       onDelete: 'set null',
     }),
-    parentId: uuid('parent_id'),
+    aggregateId: uuid('aggregate_id').references(() => aggregates.id, {
+      onDelete: 'set null',
+    }),
+    roleId: uuid('role_id').references(() => prefixRoles.id, {
+      onDelete: 'set null',
+    }),
+    parentId: uuid('parent_id').references((): AnyPgColumn => prefixes.id, {
+      onDelete: 'set null',
+    }),
     prefix: cidr('prefix').notNull(),
     family: addressFamily('family').notNull(),
     status: resourceStatus('status').notNull().default('active'),
@@ -244,6 +287,24 @@ export const prefixes = pgTable(
     uniqueIndex('prefixes_vrf_prefix_unique').on(table.vrfId, table.prefix),
   ],
 );
+
+export const ipRanges = pgTable('ip_ranges', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  vrfId: uuid('vrf_id')
+    .notNull()
+    .references(() => vrfs.id, { onDelete: 'restrict' }),
+  prefixId: uuid('prefix_id')
+    .notNull()
+    .references(() => prefixes.id, { onDelete: 'restrict' }),
+  startAddress: inet('start_address').notNull(),
+  endAddress: inet('end_address').notNull(),
+  prefixLength: integer('prefix_length').notNull(),
+  family: addressFamily('family').notNull(),
+  status: resourceStatus('status').notNull().default('active'),
+  description: text('description'),
+  owner: varchar('owner', { length: 200 }),
+  ...timestamps,
+});
 
 export const ipAddresses = pgTable(
   'ip_addresses',

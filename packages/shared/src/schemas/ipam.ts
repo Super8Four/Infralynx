@@ -173,12 +173,61 @@ export const cidrSchema = z
     );
   }, 'Enter a valid IPv4 or IPv6 CIDR prefix.');
 
+export const inetSchema = z
+  .string()
+  .trim()
+  .min(3)
+  .max(64)
+  .refine((value) => {
+    const [address, length, ...rest] = value.split('/');
+    if (!address || !length || rest.length > 0 || !/^\d+$/.test(length))
+      return false;
+    const prefixLength = Number(length);
+    if (address.includes(':')) return prefixLength >= 0 && prefixLength <= 128;
+    const octets = address.split('.');
+    return (
+      prefixLength >= 0 &&
+      prefixLength <= 32 &&
+      octets.length === 4 &&
+      octets.every((octet) => /^\d{1,3}$/.test(octet) && Number(octet) <= 255)
+    );
+  }, 'Enter a valid IPv4 or IPv6 address with a prefix length.');
+
+export const rirSchema = z.object({
+  id: z.uuid(),
+  name: z.string().max(100),
+  slug: z.string().max(100),
+  description: z.string().max(1000).nullable(),
+});
+export const aggregateSchema = z.object({
+  id: z.uuid(),
+  rirId: z.uuid(),
+  rirName: z.string(),
+  cidr: cidrSchema,
+  family: addressFamilySchema,
+  status: resourceStatusSchema,
+  description: z.string().max(1000).nullable(),
+  owner: z.string().max(200).nullable(),
+});
+export const prefixRoleSchema = z.object({
+  id: z.uuid(),
+  name: z.string().max(100),
+  slug: z.string().max(100),
+  description: z.string().max(1000).nullable(),
+});
+
 export const prefixSummarySchema = z.object({
   id: z.uuid(),
   vrfId: z.uuid(),
   vrfName: z.string(),
   siteId: z.uuid().nullable(),
   siteName: z.string().nullable(),
+  aggregateId: z.uuid().nullable(),
+  aggregateCidr: cidrSchema.nullable(),
+  roleId: z.uuid().nullable(),
+  roleName: z.string().nullable(),
+  parentId: z.uuid().nullable(),
+  parentCidr: cidrSchema.nullable(),
   cidr: cidrSchema,
   family: addressFamilySchema,
   status: resourceStatusSchema,
@@ -189,13 +238,65 @@ export const prefixSummarySchema = z.object({
 export const createPrefixSchema = z.object({
   vrfId: z.uuid(),
   siteId: z.uuid().nullable(),
+  roleId: z.uuid().nullable(),
   cidr: cidrSchema,
   status: resourceStatusSchema,
   description: z.string().trim().max(1000),
   owner: z.string().trim().max(200),
 });
 
+export const ipAddressSchema = z.object({
+  id: z.uuid(),
+  vrfId: z.uuid(),
+  vrfName: z.string(),
+  prefixId: z.uuid(),
+  prefixCidr: cidrSchema,
+  address: inetSchema,
+  family: addressFamilySchema,
+  status: resourceStatusSchema,
+  dnsName: z.string().max(253).nullable(),
+  description: z.string().max(1000).nullable(),
+  owner: z.string().max(200).nullable(),
+});
+export const createIpAddressSchema = z.object({
+  vrfId: z.uuid(),
+  address: inetSchema,
+  status: resourceStatusSchema,
+  dnsName: z.string().trim().max(253),
+  description: z.string().trim().max(1000),
+  owner: z.string().trim().max(200),
+});
+
+export const ipRangeSchema = z.object({
+  id: z.uuid(),
+  vrfId: z.uuid(),
+  vrfName: z.string(),
+  prefixId: z.uuid(),
+  prefixCidr: cidrSchema,
+  startAddress: inetSchema,
+  endAddress: inetSchema,
+  prefixLength: z.number().int().min(0).max(128),
+  family: addressFamilySchema,
+  status: resourceStatusSchema,
+  description: z.string().max(1000).nullable(),
+  owner: z.string().max(200).nullable(),
+});
+export const createIpRangeSchema = z.object({
+  vrfId: z.uuid(),
+  startAddress: inetSchema,
+  endAddress: inetSchema,
+  prefixLength: z.number().int().min(0).max(128),
+  status: resourceStatusSchema,
+  description: z.string().trim().max(1000),
+  owner: z.string().trim().max(200),
+});
+
 export const prefixListSchema = z.array(prefixSummarySchema);
+export const rirListSchema = z.array(rirSchema);
+export const aggregateListSchema = z.array(aggregateSchema);
+export const prefixRoleListSchema = z.array(prefixRoleSchema);
+export const ipAddressListSchema = z.array(ipAddressSchema);
+export const ipRangeListSchema = z.array(ipRangeSchema);
 export const siteListSchema = z.array(siteSummarySchema);
 export const vrfListSchema = z.array(vrfSummarySchema);
 export const regionListSchema = z.array(regionSchema);
@@ -210,6 +311,10 @@ export type SiteSummary = z.infer<typeof siteSummarySchema>;
 export type VrfSummary = z.infer<typeof vrfSummarySchema>;
 export type PrefixSummary = z.infer<typeof prefixSummarySchema>;
 export type CreatePrefix = z.infer<typeof createPrefixSchema>;
+export type IpAddress = z.infer<typeof ipAddressSchema>;
+export type CreateIpAddress = z.infer<typeof createIpAddressSchema>;
+export type IpRange = z.infer<typeof ipRangeSchema>;
+export type CreateIpRange = z.infer<typeof createIpRangeSchema>;
 export type Region = z.infer<typeof regionSchema>;
 export type CreateRegion = z.infer<typeof createRegionSchema>;
 export type SiteGroup = z.infer<typeof siteGroupSchema>;

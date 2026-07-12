@@ -17,5 +17,7 @@ and the project follows [Semantic Versioning](https://semver.org/).
   site locations, with PostgreSQL persistence and audit events.
 - NetBox-inspired site inventory and detail views, with Infralynx brand
   palette, search, filters, related locations, and assigned prefixes.
+- IPAM hierarchy foundation: RIRs, aggregates, prefix roles, automatic parent
+  prefixes, IP ranges, and automatic Prefix assignment for IP addresses.
 
 [Unreleased]: https://github.com/Super8Four/Infralynx/compare/v0.1.0...HEAD

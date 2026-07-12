@@ -86,6 +86,21 @@ number constraints must be enforced in the database where practical. DNS,
 DHCP, RIR synchronization, discovery, and multi-tenant ownership are later
 features and are not part of the first usable release.
 
+### IP hierarchy implementation
+
+The first working IPAM hierarchy uses RIRs and aggregates as the authoritative
+root context, prefix roles for functional classification, VRF-isolated nested
+prefixes, IP ranges, and individual IP addresses. Parent prefixes are inferred
+from CIDR containment when a prefix is created. IP addresses and ranges must
+fall within an existing Prefix in the same VRF; their parent Prefix is assigned
+automatically. The database continues to prevent duplicate prefixes and IP
+addresses within a VRF.
+
+Per-VRF duplicate-space exceptions, route targets, ASN assignment, and
+application-service mapping remain later enhancements. They require their own
+authorization, interface, and device/virtual-machine relationships rather than
+placeholder schema fields.
+
 ## Facilities site management
 
 The first facilities workflow establishes the organizational context used by
