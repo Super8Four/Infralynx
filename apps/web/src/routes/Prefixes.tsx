@@ -18,6 +18,8 @@ import {
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { getPrefixRoles } from '../lib/facilities';
+
 async function api<T>(
   url: string,
   init: RequestInit | undefined,
@@ -56,6 +58,10 @@ export function Prefixes() {
   });
   const sitesQuery = useQuery({ queryKey: ['sites'], queryFn: getSites });
   const vrfsQuery = useQuery({ queryKey: ['vrfs'], queryFn: getVrfs });
+  const rolesQuery = useQuery({
+    queryKey: ['prefix-roles'],
+    queryFn: getPrefixRoles,
+  });
 
   const createMutation = useMutation({
     mutationFn: (input: CreatePrefix) =>
@@ -72,6 +78,7 @@ export function Prefixes() {
       form.reset({
         vrfId: vrfsQuery.data?.[0]?.id ?? '',
         siteId: sitesQuery.data?.[0]?.id ?? null,
+        roleId: null,
         cidr: '',
         status: 'active',
         description: '',
@@ -93,6 +100,7 @@ export function Prefixes() {
     values: {
       vrfId: vrfsQuery.data?.[0]?.id ?? '',
       siteId: sitesQuery.data?.[0]?.id ?? null,
+      roleId: null,
       cidr: '',
       status: 'active',
       description: '',
@@ -107,6 +115,14 @@ export function Prefixes() {
       column.accessor('vrfName', { header: 'VRF' }),
       column.accessor('siteName', {
         header: 'Site',
+        cell: (cell) => cell.getValue() ?? '—',
+      }),
+      column.accessor('parentCidr', {
+        header: 'Parent',
+        cell: (cell) => cell.getValue() ?? '—',
+      }),
+      column.accessor('roleName', {
+        header: 'Role',
         cell: (cell) => cell.getValue() ?? '—',
       }),
       column.accessor('status', { header: 'Status' }),
@@ -274,6 +290,25 @@ export function Prefixes() {
               <option value="reserved">Reserved</option>
               <option value="available">Available</option>
               <option value="deprecated">Deprecated</option>
+            </select>
+
+            <label className="form-label mt-3" htmlFor="roleId">
+              Role
+            </label>
+            <select
+              id="roleId"
+              className="form-select"
+              {...form.register('roleId', {
+                setValueAs: (value: unknown) =>
+                  typeof value === 'string' && value.length > 0 ? value : null,
+              })}
+            >
+              <option value="">No role</option>
+              {(rolesQuery.data ?? []).map((role) => (
+                <option value={role.id} key={role.id}>
+                  {role.name}
+                </option>
+              ))}
             </select>
 
             <label className="form-label mt-3" htmlFor="description">

@@ -1,8 +1,13 @@
 import {
   facilitySiteListSchema,
+  aggregateListSchema,
+  ipAddressListSchema,
+  ipRangeListSchema,
   locationListSchema,
   prefixListSchema,
+  prefixRoleListSchema,
   regionListSchema,
+  rirListSchema,
   siteGroupListSchema,
 } from '@infralynx/shared';
 
@@ -31,4 +36,27 @@ export const getLocations = () =>
 export const getPrefixes = () =>
   api('/api/v1/ipam/prefixes', undefined, (value) =>
     prefixListSchema.parse(value),
+  );
+
+export const getPrefixRoles = () =>
+  api('/api/v1/ipam/prefix-roles', undefined, (value) =>
+    prefixRoleListSchema.parse(value),
+  );
+
+export const getRirs = () =>
+  api('/api/v1/ipam/rirs', undefined, (value) => rirListSchema.parse(value));
+
+export const getAggregates = () =>
+  api('/api/v1/ipam/aggregates', undefined, (value) =>
+    aggregateListSchema.parse(value),
+  );
+
+export const getIpAddresses = () =>
+  api('/api/v1/ipam/ip-addresses', undefined, (value) =>
+    ipAddressListSchema.parse(value),
+  );
+
+export const getIpRanges = () =>
+  api('/api/v1/ipam/ip-ranges', undefined, (value) =>
+    ipRangeListSchema.parse(value),
   );
