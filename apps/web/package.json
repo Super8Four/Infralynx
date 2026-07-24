@@ -16,7 +16,7 @@
     "@infralynx/shared": "0.1.0",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-table": "^8.21.3",
-    "@tanstack/react-virtual": "^3.14.5",
+    "@tanstack/react-virtual": "^3.14.8",
     "admin-lte": "^4.1.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
