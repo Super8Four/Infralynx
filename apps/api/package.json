@@ -15,7 +15,7 @@
     "db:migrate": "node dist/db/migrate.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1085.0",
+    "@aws-sdk/client-s3": "^3.1094.0",
     "@infralynx/shared": "0.1.0",
     "argon2": "^0.44.0",
     "cookie-parser": "^1.4.7",
