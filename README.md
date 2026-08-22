@@ -11,6 +11,9 @@ architectures.
 ## Project documentation
 
 - [Architecture and technology decisions](docs/architecture.md)
+- [Software development life cycle](docs/sdlc.md)
+- [Functional requirements specification](docs/functional-requirements.md)
+- [System requirements specification](docs/system-requirements.md)
 - [Development and Docker workflow](docs/development.md)
 - [Git and GitHub workflow](docs/git-workflow.md)
 - [Release and upgrade policy](docs/releases.md)
