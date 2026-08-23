@@ -3,7 +3,7 @@
 | Field            | Value           |
 | ---------------- | --------------- |
 | Document ID      | ILX-FRS-001     |
-| Version          | 0.2             |
+| Version          | 0.3             |
 | Status           | Draft           |
 | Product baseline | Infralynx 0.1.x |
 | Updated          | 2026-08-23      |
@@ -161,6 +161,29 @@ Deferred features require separate approved requirements before implementation.
 
 After the IPAM release is stable, separately approved requirements may add racks, rack groups and roles, equipment, devices, interfaces, power, cabling, configuration, and collected infrastructure state. These capabilities shall integrate with the existing sites, locations, IP resources, roles, permissions, and audit model rather than create parallel concepts.
 
+### 11.1 NetBox Community device-type import
+
+This capability is mandatory for the release that introduces Infralynx device types. It is not a gate for the current IPAM-first release.
+
+| ID         | Requirement                                                                                                                                                                                                       | Priority |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| FR-DTL-001 | Administrators shall be able to import device-type definitions from the [NetBox Community Device Type Library](https://github.com/netbox-community/devicetype-library).                                           | Must     |
+| FR-DTL-002 | The import shall work directly from the library repository and shall not require a running NetBox instance.                                                                                                       | Must     |
+| FR-DTL-003 | Administrators shall be able to select one or more manufacturers and individual device models before import.                                                                                                      | Must     |
+| FR-DTL-004 | Administrators shall be able to select or record the source branch, tag, or commit, with the resolved commit SHA shown before import.                                                                             | Must     |
+| FR-DTL-005 | Before changing Infralynx data, the system shall provide a dry-run preview classifying definitions as new, unchanged, updateable, conflicting, or invalid.                                                        | Must     |
+| FR-DTL-006 | The importer shall validate each YAML definition against the applicable upstream device-type schema and Infralynx domain rules.                                                                                   | Must     |
+| FR-DTL-007 | A valid definition shall map manufacturer, model, slug, part number, rack height, depth, airflow, weight, weight unit, subdevice role, comments, and other supported device-type attributes.                      | Must     |
+| FR-DTL-008 | The importer shall map supported fixed components, including interfaces, console ports, console-server ports, power ports, power outlets, front ports, rear ports, module bays, inventory items, and device bays. | Must     |
+| FR-DTL-009 | Re-importing the same source revision shall be idempotent and shall not create duplicate manufacturers, device types, or components.                                                                              | Must     |
+| FR-DTL-010 | When an imported definition conflicts with an existing or locally modified record, the importer shall not overwrite silently; the administrator shall be able to skip it or explicitly approve the update.        | Must     |
+| FR-DTL-011 | An import shall produce a per-definition result showing created, updated, skipped, conflicting, and rejected records with actionable validation messages.                                                         | Must     |
+| FR-DTL-012 | Imported records shall retain source repository, commit SHA, relative YAML path, source checksum, import time, and applicable CC0-1.0 provenance.                                                                 | Must     |
+| FR-DTL-013 | Every import and resulting mutation shall be attributable to the requesting administrator in audit history.                                                                                                       | Must     |
+| FR-DTL-014 | A failed download, parse, validation, or persistence operation shall not leave a partially written device type or component set.                                                                                  | Must     |
+| FR-DTL-015 | Administrators should be able to include compatible elevation images when the selected definition provides them.                                                                                                  | Should   |
+| FR-DTL-016 | Administrators should be able to schedule a check for upstream changes without automatically applying them.                                                                                                       | Should   |
+
 ## 12. Functional acceptance
 
 A requirement is accepted when:
@@ -180,6 +203,9 @@ A requirement is accepted when:
 - [ ] Define tag relationships for the first usable release.
 - [ ] Approve next-available-address and bulk-import behavior.
 - [ ] Prioritize the first DCIM expansion slice after IPAM.
+- [ ] Decide whether the initial importer supports only the official repository or approved compatible forks.
+- [ ] Define how locally modified imported fields are protected and reconciled during an update.
+- [ ] Decide whether elevation images are included in the first device-type release.
 
 ## 14. Version history
 
@@ -187,3 +213,4 @@ A requirement is accepted when:
 | ------- | ---------- | ---------------------------------------------------------------------------------- |
 | 0.1     | 2026-08-21 | Initial requirements grounded in the current repository and architecture decisions |
 | 0.2     | 2026-08-23 | Standardized the document as the FRS and requirement identifiers as `FR-*`         |
+| 0.3     | 2026-08-23 | Added NetBox Community Device Type Library import requirements                     |

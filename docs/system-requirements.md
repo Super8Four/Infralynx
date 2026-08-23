@@ -3,7 +3,7 @@
 | Field            | Value           |
 | ---------------- | --------------- |
 | Document ID      | ILX-SRS-001     |
-| Version          | 0.2             |
+| Version          | 0.3             |
 | Status           | Draft           |
 | Product baseline | Infralynx 0.1.x |
 | Updated          | 2026-08-23      |
@@ -186,7 +186,32 @@ Non-functional requirements remain in this SRS rather than a duplicate standalon
 | SR-QA-005 | Tests shall cover IPv4/IPv6 boundaries, containment, duplicates, hierarchy, concurrency, permissions, audit, and migration behavior.                       | Coverage mapping              |
 | SR-QA-006 | All committed text shall use LF line endings and Prettier-controlled formatting where applicable.                                                          | Repository and CI check       |
 
-## 15. Traceability
+## 15. External device-type import
+
+The initial external catalog is the [NetBox Community Device Type Library](https://github.com/netbox-community/devicetype-library), whose device definitions are manufacturer-organized YAML files validated by published JSON Schemas and distributed under CC0-1.0.
+
+| ID         | Requirement                                                                                                                                                                                                 | Verification                       |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| SR-DTL-001 | The importer shall retrieve the configured repository through HTTPS and resolve the selected branch or tag to an immutable commit SHA before processing.                                                    | Integration test                   |
+| SR-DTL-002 | The default source shall be restricted to `github.com/netbox-community/devicetype-library`; alternate sources shall require explicit administrative allowlisting.                                           | Security and configuration test    |
+| SR-DTL-003 | Network access shall use bounded connection/read timeouts, response-size limits, redirect limits, and retry with backoff where safe.                                                                        | Failure and adversarial tests      |
+| SR-DTL-004 | YAML shall be parsed as data with custom tags, object construction, and executable extensions disabled.                                                                                                     | Parser security tests              |
+| SR-DTL-005 | Definitions shall be validated against a supported upstream JSON Schema revision and a separately versioned Infralynx mapping contract.                                                                     | Schema contract tests              |
+| SR-DTL-006 | Unsupported upstream fields shall be retained in validation diagnostics or source metadata and shall not be silently interpreted as supported Infralynx behavior.                                           | Compatibility tests                |
+| SR-DTL-007 | Import planning shall run before persistence and produce deterministic create, update, skip, conflict, and reject operations for the selected source revision.                                              | Planning and snapshot tests        |
+| SR-DTL-008 | Manufacturer/model and manufacturer/slug identity plus component identity rules shall prevent duplicates and make re-import idempotent.                                                                     | Database and retry tests           |
+| SR-DTL-009 | A device type and its component definitions shall persist transactionally so a failure cannot leave an incomplete component set.                                                                            | Transaction rollback test          |
+| SR-DTL-010 | Import execution shall run as a durable asynchronous job with progress, cancellation before persistence, bounded concurrency, and retained results.                                                         | Job integration and recovery tests |
+| SR-DTL-011 | Imported records shall store the source URL, resolved commit SHA, relative path, content checksum, schema/mapping version, import job, import time, and source license identifier.                          | Schema and provenance tests        |
+| SR-DTL-012 | Only authorized administrators shall configure sources or execute imports; preview and execution shall be protected against CSRF and audited.                                                               | Permission and security tests      |
+| SR-DTL-013 | Import logs, errors, and stored source metadata shall not contain credentials or authorization tokens.                                                                                                      | Failure-path inspection            |
+| SR-DTL-014 | Automated tests shall use pinned repository fixtures or a local test server and shall not depend on the live upstream repository.                                                                           | CI configuration inspection        |
+| SR-DTL-015 | The import adapter shall isolate upstream YAML/schema changes from the Infralynx domain so compatibility can be versioned and tested without changing public device-type contracts.                         | Architecture review                |
+| SR-DTL-016 | Importing upstream content shall not execute scripts, hooks, containers, or other code from the source repository.                                                                                          | Security test and code inspection  |
+| SR-DTL-017 | Cached source content shall be keyed by immutable commit SHA and verified by content checksum before reuse.                                                                                                 | Cache integrity test               |
+| SR-DTL-018 | CI shall include representative definitions covering fixed components, modular parent/child devices, optional fields, unknown fields, malformed YAML, schema changes, duplicates, and local-edit conflicts. | Test inventory review              |
+
+## 16. Traceability
 
 | Functional area         | FRS requirement range   | Primary SRS requirement range           |
 | ----------------------- | ----------------------- | --------------------------------------- |
@@ -197,18 +222,23 @@ Non-functional requirements remain in this SRS rather than a duplicate standalon
 | Addresses and ranges    | `FR-IP-*`               | `SR-DAT-001–005`, `SR-PRF-*`, `SR-QA-*` |
 | UI and dashboard        | `FR-UI-*`               | `SR-UX-*`, `SR-PRF-*`                   |
 | API and audit           | `FR-API-*`, `FR-AUD-*`  | `SR-API-*`, `SR-AUD-*`, `SR-SEC-*`      |
+| Device-type import      | `FR-DTL-*`              | `SR-DTL-*`, `SR-SEC-*`, `SR-AUD-*`      |
 
-## 16. Open decisions
+## 17. Open decisions
 
 - [ ] Approve `1.0.0` scale, availability, RPO, and RTO targets.
 - [ ] Define audit and uploaded-file retention.
 - [ ] Select the durable job mechanism and production observability stack.
 - [ ] Define container publication registry and multi-architecture release workflow.
 - [ ] Approve security response times and supported browser versions.
+- [ ] Approve the supported upstream schema revision and compatibility policy.
+- [ ] Define maximum import size, duration, concurrency, and result-retention targets.
+- [ ] Select the durable job and repository-fetch implementation.
 
-## 17. Version history
+## 18. Version history
 
 | Version | Date       | Change                                                                               |
 | ------- | ---------- | ------------------------------------------------------------------------------------ |
 | 0.1     | 2026-08-21 | Initial system requirements grounded in current architecture and repository controls |
 | 0.2     | 2026-08-23 | Standardized the document as the SRS and clarified non-functional coverage           |
+| 0.3     | 2026-08-23 | Added secure, idempotent NetBox device-type library import requirements              |
