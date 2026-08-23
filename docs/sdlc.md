@@ -24,7 +24,7 @@ Discover -> Specify -> Design -> Build -> Verify -> Release -> Operate
 | Phase    | Required outcome                                                     | Gate owner              |
 | -------- | -------------------------------------------------------------------- | ----------------------- |
 | Discover | Validated IPAM/DCIM problem and measurable outcome                   | Product owner           |
-| Specify  | Approved FSR/SR IDs and acceptance criteria                          | Product and engineering |
+| Specify  | Approved FRS/SRS IDs and acceptance criteria                         | Product and engineering |
 | Design   | Reviewed API, schema, security, UI, migration, and operations design | Engineering lead        |
 | Build    | Focused, tested, documented implementation                           | Developer and reviewer  |
 | Verify   | Retained functional and system-requirement evidence                  | Quality owner           |
@@ -36,7 +36,7 @@ Discover -> Specify -> Design -> Build -> Verify -> Release -> Operate
 A work item is ready when:
 
 - The user or operational outcome is clear.
-- Applicable FSR and SR identifiers are linked.
+- Applicable FRS and SRS identifiers are linked.
 - Acceptance criteria cover success, failure, permission, and audit behavior.
 - Data, API, UI, security, portability, migration, and operational impacts are understood.
 - Dependencies and owners are identified.
@@ -159,7 +159,7 @@ A change is done when:
 
 An exception shall identify the failed control, affected scope, risk, compensating controls, accountable approver, expiration, and corrective work. Exceptions may not silently disable required checks.
 
-Product and engineering shall review this SDLC and the FSR/SR at least quarterly and after material incidents, architecture changes, or release-policy changes.
+Product and engineering shall review this SDLC, FRS, and SRS at least quarterly and after material incidents, architecture changes, or release-policy changes.
 
 ## 13. Version history
 

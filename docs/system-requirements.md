@@ -1,16 +1,35 @@
-# System requirements specification
+# Software Requirements Specification (SRS)
 
 | Field            | Value           |
 | ---------------- | --------------- |
-| Document ID      | ILX-SR-001      |
-| Version          | 0.1             |
+| Document ID      | ILX-SRS-001     |
+| Version          | 0.2             |
 | Status           | Draft           |
 | Product baseline | Infralynx 0.1.x |
-| Updated          | 2026-08-21      |
+| Updated          | 2026-08-23      |
 
 ## 1. Purpose
 
-This document defines the technical, security, data, quality, portability, and operational requirements for Infralynx. It complements the [functional requirements](functional-requirements.md) and the confirmed decisions in [architecture.md](architecture.md).
+This Software Requirements Specification (SRS) defines the technical constraints and non-functional requirements for Infralynx. It complements the behavior defined in the [Functional Requirements Specification](functional-requirements.md) and the confirmed decisions in [architecture.md](architecture.md).
+
+Together, the FRS and SRS form the approved software requirements baseline:
+
+- The **FRS** defines what Infralynx shall do.
+- The **SRS** defines the software context, technical constraints, interfaces, and how well and under what conditions Infralynx shall operate.
+
+### Non-functional requirement coverage
+
+Non-functional requirements remain in this SRS rather than a duplicate standalone document.
+
+| Quality attribute                              | SRS coverage |
+| ---------------------------------------------- | ------------ |
+| Security and privacy                           | Sections 6–8 |
+| Performance and capacity                       | Section 9    |
+| Reliability, backup, and recovery              | Section 10   |
+| Portability and deployment                     | Section 11   |
+| Observability and operability                  | Section 12   |
+| Accessibility and compatibility                | Section 13   |
+| Maintainability, testing, and delivery quality | Section 14   |
 
 ## 2. Required technology baseline
 
@@ -169,15 +188,15 @@ This document defines the technical, security, data, quality, portability, and o
 
 ## 15. Traceability
 
-| Functional area         | FSR range             | Primary SR range                  |
-| ----------------------- | --------------------- | --------------------------------- |
-| Users and authorization | FSR-AUTH-*            | SR-SEC-001–008, SR-AUD-*          |
-| Facilities              | FSR-FAC-_, FSR-SITE-_ | SR-DAT-006–008, SR-UX-_, SR-QA-_  |
-| IPAM reference data     | FSR-REF-*             | SR-DAT-_, SR-API-_                |
-| Prefixes                | FSR-PFX-*             | SR-DAT-001–005, SR-PRF-_, SR-QA-_ |
-| Addresses and ranges    | FSR-IP-*              | SR-DAT-001–005, SR-PRF-_, SR-QA-_ |
-| UI and dashboard        | FSR-UI-*              | SR-UX-_, SR-PRF-_                 |
-| API and audit           | FSR-API-_, FSR-AUD-_  | SR-API-_, SR-AUD-_, SR-SEC-*      |
+| Functional area         | FRS requirement range   | Primary SRS requirement range           |
+| ----------------------- | ----------------------- | --------------------------------------- |
+| Users and authorization | `FR-AUTH-*`             | `SR-SEC-001–008`, `SR-AUD-*`            |
+| Facilities              | `FR-FAC-*`, `FR-SITE-*` | `SR-DAT-006–008`, `SR-UX-*`, `SR-QA-*`  |
+| IPAM reference data     | `FR-REF-*`              | `SR-DAT-*`, `SR-API-*`                  |
+| Prefixes                | `FR-PFX-*`              | `SR-DAT-001–005`, `SR-PRF-*`, `SR-QA-*` |
+| Addresses and ranges    | `FR-IP-*`               | `SR-DAT-001–005`, `SR-PRF-*`, `SR-QA-*` |
+| UI and dashboard        | `FR-UI-*`               | `SR-UX-*`, `SR-PRF-*`                   |
+| API and audit           | `FR-API-*`, `FR-AUD-*`  | `SR-API-*`, `SR-AUD-*`, `SR-SEC-*`      |
 
 ## 16. Open decisions
 
@@ -192,3 +211,4 @@ This document defines the technical, security, data, quality, portability, and o
 | Version | Date       | Change                                                                               |
 | ------- | ---------- | ------------------------------------------------------------------------------------ |
 | 0.1     | 2026-08-21 | Initial system requirements grounded in current architecture and repository controls |
+| 0.2     | 2026-08-23 | Standardized the document as the SRS and clarified non-functional coverage           |
